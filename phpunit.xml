@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.0/phpunit.xsd"
+         bootstrap="core/bootstrap.php"
+         colors="true"
+         beStrictAboutChangesToGlobalState="true"
+         beStrictAboutOutputDuringTests="true"
+         beStrictAboutTestsThatDoNotTestAnything="true"
+         failOnRisky="true"
+         failOnWarning="true"
+         processIsolation="false"
+         stopOnFailure="false">
+    <testsuites>
+        <testsuite name="SpaceGame Tests">
+            <directory>tests/php</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>core</directory>
+        </include>
+    </source>
+    <php>
+        <ini name="date.timezone" value="UTC"/>
+        <ini name="error_reporting" value="-1"/>
+    </php>
+</phpunit>
