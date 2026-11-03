@@ -35,10 +35,11 @@
 ---
 
 ### Task 4: Schema DB, installazione, connessione, lock
-- [ ] Step 1: Test (DB di test `spacegame_test` da `config.local.php`): `test_install_creates_tables`, `test_lock_excludes_second_holder` (seconda connessione riceve `LockBusy`), `test_tx_rolls_back_on_exception`.
-- [ ] Step 2-4: FAIL → implementa → PASS. Commit.
+- [x] Step 1: Test (DB di test `spacegame_test` da `config.local.php`): `test_install_creates_tables`, `test_lock_excludes_second_holder` (seconda connessione riceve `LockBusy`), `test_tx_rolls_back_on_exception`.
+- [x] Step 2-4: FAIL → implementa → PASS. Commit.
 
-**Stato:** IN ATTESA
+**Commit:** 991b1dd
+**Stato:** COMPLETATO
 
 ---
 
