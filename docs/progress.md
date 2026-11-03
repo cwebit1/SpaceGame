@@ -52,6 +52,13 @@
 
 ---
 
+**Milestone A COMPLETATA**
+- Tutti i task (1-5) completati con test verdi
+- Tag `milestone-A` creato al commit 24c4943
+- Push su GitHub effettuato con tag
+
+---
+
 ## Milestone B — Tempo, economia, code
 
 ### Task 6: Clock ed EventBus
