@@ -26,10 +26,11 @@
 ---
 
 ### Task 3: Formule pure e formattazione numeri
-- [ ] Step 1: Test: `levelCurve(40,1.08,10) ≈ 863.57`; `cost(['m'=>80,'c'=>20],1.55,3)` → m=192.2, c=48.05; `buildHours` con robot 0 naniti 0 speed 1 per 3000 risorse = 1.0; naniti 1 → 0.25; `upgradeCost` L11 ha `lu=50`. Format: `short(12450000000)`="12,45 Mld", `short(999)`="999", `short(1.5e15)`="1,50 Bld", `short(1.23e66)`="1,23e66", `parse('2,5Mln')`=2500000, `parse('5k')`=5000, `parse('')`=null, `parse('-3')`=null, `parse('abc')`=null, `short(NAN)`="0".
-- [ ] Step 2-4: FAIL → implementa (sigle da `format.scale` in config, passate al JS via API `/api/config/format`) → PASS (`vendor/bin/phpunit`, `node tests/js/format.test.mjs`). Commit.
+- [x] Step 1: Test: `levelCurve(40,1.08,10) ≈ 863.57`; `cost(['m'=>80,'c'=>20],1.55,3)` → m=192.2, c=48.05; `buildHours` con robot 0 naniti 0 speed 1 per 3000 risorse = 1.0; naniti 1 → 0.25; `upgradeCost` L11 ha `lu=50`. Format: `short(12450000000)`="12,45 Mld", `short(999)`="999", `short(1.5e15)`="1,50 Bld", `short(1.23e66)`="1,23e66", `parse('2,5Mln')`=2500000, `parse('5k')`=5000, `parse('')`=null, `parse('-3')`=null, `parse('abc')`=null, `short(NAN)`="0".
+- [x] Step 2-4: FAIL → implementa (sigle da `format.scale` in config, passate al JS via API `/api/config/format`) → PASS (`vendor/bin/phpunit`, `node tests/js/format.test.mjs`). Commit.
 
-**Stato:** IN ATTESA
+**Commit:** (da creare)
+**Stato:** COMPLETATO
 
 ---
 
