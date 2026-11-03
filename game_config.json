@@ -1,0 +1,1349 @@
+{
+  "settings": {
+    "player_speed_min": 1,
+    "player_speed_max": 100,
+    "cpu_resource_mult_min": 0,
+    "cpu_resource_mult_max": 100,
+    "cpu_research_mult_min": 0,
+    "cpu_research_mult_max": 100,
+    "galaxy_count_min": 3,
+    "galaxy_count_max": 9,
+    "system_count_min": 100,
+    "system_count_max": 499,
+    "cpu_density_min": 0,
+    "cpu_density_max": 100,
+    "cpu_planet_size_min": 10,
+    "cpu_planet_size_max": 100
+  },
+  "galaxy": {
+    "positions_per_system": 20,
+    "planet_positions": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+    "warp_position": 16,
+    "asteroid_positions": [17, 18, 19, 20],
+    "planet_types": {
+      "rocky": { "name": "Roccioso", "metal_bonus": 1.2 },
+      "crystalline": { "name": "Cristallino", "crystal_bonus": 1.2 },
+      "oceanic": { "name": "Oceanico", "deuterium_bonus": 1.2 },
+      "desert": { "name": "Desertico", "solar_bonus": 1.2 },
+      "standard": { "name": "Standard" }
+    },
+    "position_temp_modifiers": {
+      "1-3": { "solar": 1.3, "deuterium": 0.7, "geothermal": 1.5 },
+      "4-6": { "solar": 1.15, "deuterium": 0.85, "geothermal": 1.25 },
+      "7-9": { "solar": 1.0, "deuterium": 1.0, "geothermal": 1.0 },
+      "10-12": { "solar": 0.85, "deuterium": 1.15, "geothermal": 0.75 },
+      "13-15": { "solar": 0.7, "deuterium": 1.3, "geothermal": 0.5 }
+    },
+    "planet_type_modifiers": {
+      "rocky": { "metal": 1.2 },
+      "crystalline": { "crystal": 1.2 },
+      "oceanic": { "deuterium": 1.2 },
+      "desert": { "solar": 1.2 },
+      "standard": {}
+    }
+  },
+  "resources": {
+    "base_production": {
+      "metal": 20,
+      "crystal": 10,
+      "deuterium": 0,
+      "lunarite": 0
+    },
+    "storage": {
+      "metal": { "base": 10000, "growth": 1.7 },
+      "crystal": { "base": 10000, "growth": 1.7 },
+      "deuterium": { "base": 10000, "growth": 1.7 },
+      "lunarite": { "base": 2000, "growth": 1.7 }
+    },
+    "protected_percentage": 0.1,
+    "bunker_bonus_per_level": 0.05,
+    "overflow_multiplier": 2.0
+  },
+  "buildings": {
+    "metal_mine": {
+      "cost": { "m": 80, "c": 20, "d": 0, "lu": 0 },
+      "growth": 1.55,
+      "requires": {},
+      "energy": { "a": 8, "b": 1.07 },
+      "effect": { "production_metal": { "a": 40, "b": 1.08 } },
+      "fields": 1
+    },
+    "crystal_mine": {
+      "cost": { "m": 60, "c": 35, "d": 0, "lu": 0 },
+      "growth": 1.6,
+      "requires": {},
+      "energy": { "a": 9, "b": 1.07 },
+      "effect": { "production_crystal": { "a": 25, "b": 1.08 } },
+      "fields": 1
+    },
+    "deuterium_synthesizer": {
+      "cost": { "m": 220, "c": 70, "d": 0, "lu": 0 },
+      "growth": 1.55,
+      "requires": {},
+      "energy": { "a": 12, "b": 1.07 },
+      "effect": { "production_deuterium": { "a": 12, "b": 1.08 } },
+      "fields": 1
+    },
+    "power_plant": {
+      "cost": { "m": 50, "c": 20, "d": 0, "lu": 0 },
+      "growth": 1.5,
+      "requires": {},
+      "energy": { "flat_per_level": 0 },
+      "effect": { "energy": { "a": 12, "b": 1.06 } },
+      "fields": 1
+    },
+    "solar_plant": {
+      "cost": { "m": 70, "c": 30, "d": 0, "lu": 0 },
+      "growth": 1.55,
+      "requires": {},
+      "energy": { "flat_per_level": 0 },
+      "effect": { "energy": { "a": 22, "b": 1.08 } },
+      "fields": 1
+    },
+    "geothermal_plant": {
+      "cost": { "m": 300, "c": 150, "d": 0, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.geology": 1 },
+      "energy": { "flat_per_level": 0 },
+      "effect": { "energy": { "a": 30, "b": 1.08 } },
+      "fields": 1
+    },
+    "nuclear_plant": {
+      "cost": { "m": 600, "c": 300, "d": 0, "lu": 0 },
+      "growth": 1.75,
+      "requires": { "research.nuclear_physics": 1, "research.robotics": 3 },
+      "energy": { "flat_per_level": 0 },
+      "effect": { "energy": { "a": 28, "b": 1.15 } },
+      "fields": 1
+    },
+    "fusion_plant": {
+      "cost": { "m": 900, "c": 360, "d": 180, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "research.energy_tech": 3, "building.deuterium_synthesizer": 5 },
+      "energy": { "a": 6, "b": 1.08 },
+      "effect": { "energy": { "a": 35, "b": 1.09 } },
+      "fields": 1
+    },
+    "antimatter_reactor": {
+      "cost": { "m": 200000, "c": 150000, "d": 50000, "lu": 10000 },
+      "growth": 1.8,
+      "requires": { "research.antimatter_physics": 1, "building.lunar_nanoforge": 3 },
+      "energy": { "a": 2, "b": 1.1 },
+      "effect": { "energy": { "a": 500, "b": 1.12 } },
+      "fields": 1
+    },
+    "solar_satellite": {
+      "cost": { "m": 0, "c": 2000, "d": 500, "lu": 0 },
+      "growth": 1.0,
+      "requires": { "research.orbital_tech": 1, "building.crystal_mine": 1 },
+      "energy": { "flat_per_level": 0 },
+      "effect": { "energy_per_unit": 25 },
+      "fields": 0
+    },
+    "energy_storage": {
+      "cost": { "m": 2000, "c": 3000, "d": 0, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "research.orbital_tech": 2 },
+      "energy": { "flat_per_level": 0 },
+      "effect": { "capacity": { "a": 5000, "b": 1.6 } },
+      "fields": 1
+    },
+    "robot_factory": {
+      "cost": { "m": 400, "c": 120, "d": 200, "lu": 0 },
+      "growth": 1.7,
+      "requires": {},
+      "energy": { "flat_per_level": 0 },
+      "effect": { "build_time_factor": 0.15 },
+      "fields": 1
+    },
+    "nanite_factory": {
+      "cost": { "m": 1000000, "c": 500000, "d": 100000, "lu": 0 },
+      "growth": 1.8,
+      "requires": { "building.robot_factory": 10, "research.computer": 10 },
+      "energy": { "flat_per_level": 0 },
+      "effect": { "all_time_factor": 0.25 },
+      "fields": 0
+    },
+    "shipyard": {
+      "cost": { "m": 400, "c": 200, "d": 100, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "building.robot_factory": 2 },
+      "energy": { "flat_per_level": 0 },
+      "effect": { "ship_time_factor": 0.2, "upgrade_time_factor": 0.1 },
+      "fields": 1
+    },
+    "research_lab": {
+      "cost": { "m": 200, "c": 400, "d": 200, "lu": 0 },
+      "growth": 1.7,
+      "requires": {},
+      "energy": { "flat_per_level": 0 },
+      "effect": { "research_time_factor": 0.25 },
+      "fields": 1
+    },
+    "terraformer": {
+      "cost": { "m": 0, "c": 50000, "d": 100000, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "research.terraforming": 1, "building.nanite_factory": 1 },
+      "energy": { "flat_per_level": 50 },
+      "effect": { "fields_bonus": 200 },
+      "fields": 0
+    },
+    "missile_silo": {
+      "cost": { "m": 20000, "c": 20000, "d": 1000, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "research.ballistics": 1, "building.crystal_mine": 1 },
+      "energy": { "flat_per_level": 0 },
+      "effect": { "slots": { "base": 6, "per_level": 3 } },
+      "fields": 1
+    },
+    "sensor_phalanx": {
+      "cost": { "m": 20000, "c": 40000, "d": 20000, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "research.advanced_sensors": 3, "research.hyperspace": 4 },
+      "energy": { "flat_per_level": 30 },
+      "effect": { "range_systems": { "base": 2, "per_level_factor": 2 }, "deuterium_per_scan": 5000, "cooldown_minutes": 10 },
+      "fields": 1
+    },
+    "teleporter": {
+      "cost": { "m": 2000000, "c": 4000000, "d": 2000000, "lu": 0 },
+      "growth": 1.8,
+      "requires": { "research.teleportation": 5, "building.nanite_factory": 1, "research.hyperspace_tech": 6 },
+      "energy": { "flat_per_level": 100 },
+      "effect": { "capacity_weight_per_level": 1000000, "deuterium_per_10_weight": 1, "recharge_hours": 2 },
+      "fields": 1
+    },
+    "deep_core_drill": {
+      "cost": { "m": 20000, "c": 10000, "d": 5000, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "research.geology": 4, "building.metal_mine": 10, "building.robot_factory": 5 },
+      "energy": { "flat_per_level": 40 },
+      "effect": { "mine_bonus_pct": 0.03 },
+      "fields": 1
+    },
+    "planetary_bunker": {
+      "cost": { "m": 10000, "c": 10000, "d": 0, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "building.metal_storage": 3, "building.crystal_storage": 3, "building.deuterium_tank": 3 },
+      "energy": { "flat_per_level": 15 },
+      "effect": { "protected_bonus_pct": 0.05 },
+      "fields": 1
+    },
+    "repair_bay": {
+      "cost": { "m": 15000, "c": 10000, "d": 5000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.military_science": 1, "research.armor": 4, "research.shield_tech": 4 },
+      "energy": { "flat_per_level": 30 },
+      "effect": { "repair_pct_per_level": 0.02, "max_repair_pct": 0.25 },
+      "fields": 1
+    },
+    "trade_center": {
+      "cost": { "m": 8000, "c": 8000, "d": 2000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.galactic_economy": 1, "building.robot_factory": 4 },
+      "energy": { "flat_per_level": 10 },
+      "effect": { "market_rate_bonus_pct": 0.02, "extra_cpu_offers": 1 },
+      "fields": 1
+    },
+    "embassy": {
+      "cost": { "m": 5000, "c": 10000, "d": 2000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.diplomacy": 1, "building.robot_factory": 3 },
+      "energy": { "flat_per_level": 10 },
+      "effect": { "relation_gain_bonus_pct": 0.1, "alliance_from_level": 3, "tribute_from_level": 5 },
+      "fields": 1
+    },
+    "intelligence_agency": {
+      "cost": { "m": 10000, "c": 20000, "d": 5000, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "research.counterespionage": 1 },
+      "energy": { "flat_per_level": 20 },
+      "effect": { "probe_detection_bonus_pct": 0.1, "false_reports_from_level": 5 },
+      "fields": 1
+    },
+    "missile_factory": {
+      "cost": { "m": 15000, "c": 10000, "d": 5000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.ballistics": 3, "building.missile_silo": 3 },
+      "energy": { "flat_per_level": 25 },
+      "effect": { "missile_time_reduction_pct": 0.1, "range_bonus_per_2_levels": 1 },
+      "fields": 1
+    },
+    "recycling_plant": {
+      "cost": { "m": 12000, "c": 8000, "d": 4000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.recycling": 1, "research.crystal_tech": 4 },
+      "energy": { "flat_per_level": 20 },
+      "effect": { "debris_collection_bonus_pct": 0.02 },
+      "fields": 1
+    },
+    "fleet_command": {
+      "cost": { "m": 25000, "c": 25000, "d": 10000, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "research.logistics": 2, "research.crystal_tech": 5 },
+      "energy": { "flat_per_level": 30 },
+      "effect": { "extra_fleet_per_3_levels": 1, "deuterium_reduction_pct_per_level": 0.02, "max_deuterium_reduction_pct": 0.4 },
+      "fields": 1
+    },
+    "pirate_bounty_office": {
+      "cost": { "m": 10000, "c": 15000, "d": 5000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.pirate_hunting": 1 },
+      "energy": { "flat_per_level": 15 },
+      "effect": { "warp_rift_loot_bonus_pct": 0.05, "shows_next_warp": true },
+      "fields": 1
+    },
+    "construction_hub": {
+      "cost": { "m": 50000, "c": 30000, "d": 10000, "lu": 0 },
+      "growth": 1.8,
+      "requires": { "research.logistics": 4, "building.robot_factory": 8 },
+      "energy": { "flat_per_level": 50 },
+      "effect": { "parallel_build_slot_per_5_levels": 1 },
+      "fields": 1
+    },
+    "assembly_line": {
+      "cost": { "m": 50000, "c": 40000, "d": 10000, "lu": 0 },
+      "growth": 1.8,
+      "requires": { "research.logistics": 4, "research.crystal_tech": 8 },
+      "energy": { "flat_per_level": 50 },
+      "effect": { "parallel_shipyard_slot_per_5_levels": 1 },
+      "fields": 1
+    },
+    "quantum_archive": {
+      "cost": { "m": 20000, "c": 40000, "d": 10000, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "research.quantum_engineering": 1, "building.research_lab": 8 },
+      "energy": { "flat_per_level": 40 },
+      "effect": { "research_cost_reduction_pct_per_level": 0.01, "max_reduction_pct": 0.3 },
+      "fields": 1
+    },
+    "war_academy": {
+      "cost": { "m": 30000, "c": 20000, "d": 10000, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "research.military_science": 3, "research.crystal_tech": 6 },
+      "energy": { "flat_per_level": 30 },
+      "effect": { "ship_defense_cost_reduction_pct_per_level": 0.01, "max_reduction_pct": 0.25 },
+      "fields": 1
+    },
+    "asteroid_processing_plant": {
+      "cost": { "m": 15000, "c": 10000, "d": 5000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.geology": 3, "building.robot_factory": 4 },
+      "energy": { "flat_per_level": 30 },
+      "effect": { "miner_unload_bonus_pct_per_level": 0.03 },
+      "fields": 1
+    },
+    "resource_converter": {
+      "cost": { "m": 20000, "c": 20000, "d": 10000, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "research.galactic_economy": 4, "building.robot_factory": 6 },
+      "energy": { "flat_per_level": 60 },
+      "effect": { "conversion_rate_per_hour_per_level": 10000 },
+      "fields": 1
+    },
+    "colony_hub": {
+      "cost": { "m": 15000, "c": 15000, "d": 5000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.advanced_colonization": 1 },
+      "energy": { "flat_per_level": 20 },
+      "effect": { "colony_building_level_half": true, "colony_resource_bonus_pct_per_level": 0.1 },
+      "fields": 1
+    },
+    "jamming_tower": {
+      "cost": { "m": 20000, "c": 30000, "d": 10000, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "research.counterespionage": 4 },
+      "energy": { "flat_per_level": 40 },
+      "effect": { "phalanx_block_chance_pct_per_level": 0.08, "max_chance_pct": 0.6 },
+      "fields": 1
+    },
+    "weather_control": {
+      "cost": { "m": 25000, "c": 25000, "d": 15000, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "research.climatology": 1 },
+      "energy": { "flat_per_level": 50 },
+      "effect": { "negative_event_reduction_pct_per_level": 0.05, "max_reduction_pct": 0.5 },
+      "fields": 1
+    },
+    "orbital_elevator": {
+      "cost": { "m": 30000, "c": 15000, "d": 5000, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "research.orbital_tech": 5, "building.robot_factory": 6 },
+      "energy": { "flat_per_level": 30 },
+      "effect": { "departure_deuterium_reduction_pct_per_level": 0.05, "fleet_cargo_bonus_pct_per_level": 0.02 },
+      "fields": 1
+    }
+  },
+  "moon_buildings": {
+    "lunar_nanoforge": {
+      "cost": { "m": 200000, "c": 400000, "d": 100000, "lu": 0 },
+      "growth": 1.8,
+      "requires": { "research.lunar_engineering": 1, "building.nanite_factory": 1 },
+      "energy": { "flat_per_level": 0 },
+      "effect": { "creates_moon": true, "fields_bonus_per_level": 200 },
+      "fields": 1
+    },
+    "lunarite_extractor": {
+      "cost": { "m": 10000, "c": 10000, "d": 5000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "building.lunar_nanoforge": 1 },
+      "energy": { "a": 15, "b": 1.08 },
+      "effect": { "production_lunarite": { "a": 5, "b": 1.08 } },
+      "fields": 1
+    },
+    "deuterium_extractor": {
+      "cost": { "m": 3000, "c": 1500, "d": 0, "lu": 0 },
+      "growth": 1.55,
+      "requires": { "building.lunar_nanoforge": 1 },
+      "energy": { "a": 12, "b": 1.07 },
+      "effect": { "production_deuterium": { "a": 15, "b": 1.08 } },
+      "fields": 1
+    },
+    "lunar_solar_array": {
+      "cost": { "m": 0, "c": 0, "d": 0, "lu": 0 },
+      "growth": 1.55,
+      "requires": { "building.lunar_nanoforge": 1 },
+      "energy": { "flat_per_level": 0 },
+      "effect": { "energy": { "a": 25, "b": 1.08 } },
+      "fields": 1
+    },
+    "lunarite_vault": {
+      "cost": { "m": 0, "c": 0, "d": 0, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "building.lunarite_extractor": 1 },
+      "energy": { "flat_per_level": 0 },
+      "effect": { "capacity": { "a": 2000, "b": 1.6 } },
+      "fields": 1
+    },
+    "lunar_bunker": {
+      "cost": { "m": 10000, "c": 10000, "d": 0, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "building.lunar_nanoforge": 2 },
+      "energy": { "flat_per_level": 0 },
+      "effect": { "protected_bonus_pct": 0.05 },
+      "fields": 1
+    },
+    "lunar_shipyard": {
+      "cost": { "m": 10000, "c": 5000, "d": 2000, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "building.lunar_nanoforge": 2, "research.lunar_engineering": 2 },
+      "energy": { "flat_per_level": 0 },
+      "effect": { "ship_time_factor": 0.2 },
+      "fields": 1
+    },
+    "upgrade_forge": {
+      "cost": { "m": 20000, "c": 20000, "d": 10000, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "building.lunar_nanoforge": 2, "research.computer": 6 },
+      "energy": { "flat_per_level": 40 },
+      "effect": { "upgrade_time_factor": 0.25 },
+      "fields": 1
+    },
+    "lunar_bulwark": {
+      "cost": { "m": 20000, "c": 10000, "d": 0, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "building.lunar_nanoforge": 2, "research.lunar_engineering": 4, "research.armor": 6 },
+      "energy": { "flat_per_level": 0 },
+      "effect": { "resistance_bonus_pct": 0.1 },
+      "fields": 1
+    },
+    "orbital_dock": {
+      "cost": { "m": 15000, "c": 10000, "d": 5000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "building.lunar_nanoforge": 3, "building.lunar_shipyard": 2, "research.military_science": 4 },
+      "energy": { "flat_per_level": 0 },
+      "effect": { "repair_pct_per_level": 0.02, "max_repair_pct": 0.3 },
+      "fields": 1
+    },
+    "deep_space_radar": {
+      "cost": { "m": 10000, "c": 20000, "d": 5000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "building.lunar_nanoforge": 3, "research.advanced_sensors": 1 },
+      "energy": { "flat_per_level": 20 },
+      "effect": { "warning_range_systems": 1, "approximate_composition": true },
+      "fields": 1
+    },
+    "hyperspace_relay": {
+      "cost": { "m": 30000, "c": 30000, "d": 20000, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "building.lunar_nanoforge": 4, "research.teleportation": 1 },
+      "energy": { "flat_per_level": 0 },
+      "effect": { "fleet_speed_bonus_pct_per_level": 0.05 },
+      "fields": 1
+    },
+    "admirals_academy": {
+      "cost": { "m": 50000, "c": 80000, "d": 20000, "lu": 2000 },
+      "growth": 1.7,
+      "requires": { "building.lunar_nanoforge": 3, "research.military_science": 6, "research.computer": 8 },
+      "energy": { "flat_per_level": 30 },
+      "effect": { "medal_bonus_pct_per_level": 0.05, "admiral_cost_reduction_pct_per_level": 0.02 },
+      "fields": 1
+    },
+    "mining_control": {
+      "cost": { "m": 20000, "c": 15000, "d": 5000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "building.lunar_nanoforge": 2, "research.mining_tech": 4 },
+      "energy": { "flat_per_level": 20 },
+      "effect": { "miner_extraction_bonus_pct_per_level": 0.05, "extra_stratum_per_5_levels": 1 },
+      "fields": 1
+    },
+    "lunar_observatory": {
+      "cost": { "m": 30000, "c": 50000, "d": 10000, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "building.lunar_nanoforge": 2, "research.advanced_sensors": 5 },
+      "energy": { "flat_per_level": 25 },
+      "effect": { "event_warning_hours_per_level": 1, "research_speed_bonus_pct_per_level": 0.02 },
+      "fields": 1
+    },
+    "cryo_hangar": {
+      "cost": { "m": 100000, "c": 60000, "d": 40000, "lu": 5000 },
+      "growth": 1.8,
+      "requires": { "building.lunar_nanoforge": 4, "research.counterespionage": 8 },
+      "energy": { "flat_per_level": 60 },
+      "effect": { "capacity_weight_per_level": 500000, "hidden_from_spy": true, "hidden_from_phalanx": true },
+      "fields": 1
+    },
+    "interdiction_field": {
+      "cost": { "m": 120000, "c": 120000, "d": 60000, "lu": 8000 },
+      "growth": 1.8,
+      "requires": { "building.lunar_nanoforge": 5, "research.quantum_engineering": 5 },
+      "energy": { "flat_per_level": 80 },
+      "effect": { "enemy_fleet_speed_reduction_pct_per_level": 0.03, "max_reduction_pct": 0.45 },
+      "fields": 1
+    },
+    "decoy_generator": {
+      "cost": { "m": 40000, "c": 60000, "d": 20000, "lu": 1000 },
+      "growth": 1.7,
+      "requires": { "building.lunar_nanoforge": 3, "research.counterespionage": 6 },
+      "energy": { "flat_per_level": 40 },
+      "effect": { "ghost_fleet_overestimate_pct_per_level": 0.1 },
+      "fields": 1
+    },
+    "mass_driver": {
+      "cost": { "m": 60000, "c": 30000, "d": 10000, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "building.lunar_nanoforge": 3, "research.logistics": 6 },
+      "energy": { "flat_per_level": 50 },
+      "effect": { "transfer_rate_per_hour_per_level": 100000, "works_at_any_distance_after_move": true },
+      "fields": 1
+    },
+    "warp_beacon": {
+      "cost": { "m": 50000, "c": 50000, "d": 30000, "lu": 3000 },
+      "growth": 1.7,
+      "requires": { "building.lunar_nanoforge": 4, "research.teleportation": 3 },
+      "energy": { "flat_per_level": 50 },
+      "effect": { "warp_rift_gauntlet_travel_time_reduction_pct_per_level": 0.05 },
+      "fields": 1
+    },
+    "sensor_phalanx": {
+      "cost": { "m": 20000, "c": 40000, "d": 20000, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "research.advanced_sensors": 3, "research.hyperspace": 4 },
+      "energy": { "flat_per_level": 30 },
+      "effect": { "range_systems": { "base": 2, "per_level_factor": 2 }, "deuterium_per_scan": 5000, "cooldown_minutes": 10 },
+      "fields": 1
+    },
+    "teleporter": {
+      "cost": { "m": 2000000, "c": 4000000, "d": 2000000, "lu": 0 },
+      "growth": 1.8,
+      "requires": { "research.teleportation": 5, "building.nanite_factory": 1, "research.hyperspace_tech": 6 },
+      "energy": { "flat_per_level": 100 },
+      "effect": { "capacity_weight_per_level": 1000000, "deuterium_per_10_weight": 1, "recharge_hours": 2 },
+      "fields": 1
+    },
+    "antimatter_reactor": {
+      "cost": { "m": 200000, "c": 150000, "d": 50000, "lu": 10000 },
+      "growth": 1.8,
+      "requires": { "research.antimatter_physics": 1, "building.lunar_nanoforge": 3 },
+      "energy": { "a": 2, "b": 1.1 },
+      "effect": { "energy": { "a": 500, "b": 1.12 } },
+      "fields": 1
+    }
+  },
+  "research": {
+    "energy_tech": {
+      "cost": { "m": 0, "c": 800, "d": 400, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "building.research_lab": 1 },
+      "effect": { "energy_bonus_pct_per_level": 0.02 }
+    },
+    "laser_tech": {
+      "cost": { "m": 200, "c": 100, "d": 0, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.energy_tech": 2 },
+      "effect": { "laser_damage_bonus_pct_per_level": 0.01 }
+    },
+    "ion_tech": {
+      "cost": { "m": 1000, "c": 300, "d": 100, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.laser_tech": 5, "research.energy_tech": 4 },
+      "effect": { "ion_damage_bonus_pct_per_level": 0.01 }
+    },
+    "plasma_tech": {
+      "cost": { "m": 2000, "c": 4000, "d": 1000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.ion_tech": 5, "research.energy_tech": 8 },
+      "effect": { "metal_bonus_pct_per_level": 0.01, "crystal_bonus_pct_per_level": 0.0066, "deuterium_bonus_pct_per_level": 0.0033 }
+    },
+    "hyperspace_tech": {
+      "cost": { "m": 0, "c": 4000, "d": 2000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.energy_tech": 5, "research.shield_tech": 5 },
+      "effect": { "cargo_bonus_pct_per_level": 0.05 }
+    },
+    "combustion_drive": {
+      "cost": { "m": 400, "c": 0, "d": 600, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.energy_tech": 1 },
+      "effect": { "combustion_speed_bonus_pct_per_level": 0.1 }
+    },
+    "impulse_drive": {
+      "cost": { "m": 2000, "c": 4000, "d": 600, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.energy_tech": 1 },
+      "effect": { "impulse_speed_bonus_pct_per_level": 0.2, "missile_range_bonus_systems_per_level": 5 }
+    },
+    "hyperspace_drive": {
+      "cost": { "m": 10000, "c": 20000, "d": 6000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.hyperspace_tech": 3 },
+      "effect": { "hyperspace_speed_bonus_pct_per_level": 0.3 }
+    },
+    "weapon_tech": {
+      "cost": { "m": 800, "c": 200, "d": 0, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "building.research_lab": 4 },
+      "effect": { "attack_bonus_pct_per_level": 0.1 }
+    },
+    "shield_tech": {
+      "cost": { "m": 200, "c": 600, "d": 0, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.energy_tech": 3, "building.research_lab": 6 },
+      "effect": { "shield_bonus_pct_per_level": 0.1 }
+    },
+    "armor_tech": {
+      "cost": { "m": 1000, "c": 0, "d": 0, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "building.research_lab": 2 },
+      "effect": { "structure_bonus_pct_per_level": 0.1 }
+    },
+    "espionage_tech": {
+      "cost": { "m": 200, "c": 1000, "d": 200, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "building.research_lab": 3 },
+      "effect": { "info_and_stealth_bonus_per_level": 1 }
+    },
+    "computer_tech": {
+      "cost": { "m": 0, "c": 400, "d": 600, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "building.research_lab": 1 },
+      "effect": { "fleet_slots_per_level": 1, "defense_initiative_bonus_pct_per_level": 0.01 }
+    },
+    "astrophysics": {
+      "cost": { "m": 4000, "c": 8000, "d": 4000, "lu": 0 },
+      "growth": 1.5,
+      "requires": { "research.espionage_tech": 4, "research.impulse_drive": 3 },
+      "effect": { "colony_slots_per_level": 0.5, "expedition_bonus_per_level": 1 }
+    },
+    "research_network": {
+      "cost": { "m": 240000, "c": 400000, "d": 160000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "building.research_lab": 10, "research.computer_tech": 8, "research.hyperspace_tech": 8 },
+      "effect": { "sums_labs_of_planets_per_level": 1 }
+    },
+    "terraforming": {
+      "cost": { "m": 50000, "c": 100000, "d": 50000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.energy_tech": 12, "building.nanite_factory": 1 },
+      "effect": { "unlocks_terraformer": true }
+    },
+    "geology": {
+      "cost": { "m": 1000, "c": 500, "d": 0, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "building.research_lab": 3 },
+      "effect": { "mine_bonus_pct_per_level": 0.01 }
+    },
+    "nuclear_physics": {
+      "cost": { "m": 2000, "c": 2000, "d": 500, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.energy_tech": 4 },
+      "effect": { "nuclear_energy_bonus_pct_per_level": 0.01 }
+    },
+    "antimatter_physics": {
+      "cost": { "m": 200000, "c": 300000, "d": 100000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.nuclear_physics": 10, "research.plasma_tech": 10 },
+      "effect": { "antimatter_lunarite_consumption_reduction_pct_per_level": 0.01 }
+    },
+    "orbital_tech": {
+      "cost": { "m": 500, "c": 1000, "d": 200, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.energy_tech": 2, "building.crystal_mine": 1 },
+      "effect": { "solar_satellite_energy_bonus_pct_per_level": 0.01 }
+    },
+    "mining_tech": {
+      "cost": { "m": 3000, "c": 2000, "d": 1000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.geology": 2, "research.astrophysics": 1 },
+      "effect": { "miner_extraction_bonus_pct_per_level": 0.01 }
+    },
+    "logistics": {
+      "cost": { "m": 5000, "c": 5000, "d": 2000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.computer_tech": 4 },
+      "effect": { "queue_speed_bonus_pct_per_level": 0.01 }
+    },
+    "galactic_economy": {
+      "cost": { "m": 2000, "c": 3000, "d": 0, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.computer_tech": 2 },
+      "effect": { "market_rate_bonus_pct_per_level": 0.01 }
+    },
+    "diplomacy": {
+      "cost": { "m": 1000, "c": 3000, "d": 0, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.computer_tech": 2 },
+      "effect": { "relation_gain_bonus_pct_per_level": 0.02 }
+    },
+    "counterespionage": {
+      "cost": { "m": 3000, "c": 6000, "d": 1000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.espionage_tech": 4 },
+      "effect": { "probe_detection_bonus_pct_per_level": 0.02 }
+    },
+    "advanced_sensors": {
+      "cost": { "m": 5000, "c": 8000, "d": 2000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.espionage_tech": 5, "research.hyperspace_tech": 2 },
+      "effect": { "radar_range_bonus_pct_per_level": 0.01 }
+    },
+    "ballistics": {
+      "cost": { "m": 3000, "c": 1000, "d": 2000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.impulse_drive": 2 },
+      "effect": { "missile_damage_bonus_pct_per_level": 0.02 }
+    },
+    "teleportation": {
+      "cost": { "m": 50000, "c": 80000, "d": 40000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.hyperspace_tech": 6, "research.hyperspace_tech": 4 },
+      "effect": { "teleporter_recharge_reduction_pct_per_level": 0.02 }
+    },
+    "military_science": {
+      "cost": { "m": 5000, "c": 3000, "d": 1000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.weapon_tech": 4, "research.armor_tech": 4 },
+      "effect": { "ship_repair_bonus_pct_per_level": 0.01 }
+    },
+    "recycling": {
+      "cost": { "m": 2000, "c": 2000, "d": 500, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.combustion_drive": 4 },
+      "effect": { "debris_collection_bonus_pct_per_level": 0.01 }
+    },
+    "advanced_colonization": {
+      "cost": { "m": 5000, "c": 10000, "d": 5000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.astrophysics": 3 },
+      "effect": { "colony_initial_resource_bonus_pct_per_level": 0.02 }
+    },
+    "quantum_engineering": {
+      "cost": { "m": 40000, "c": 80000, "d": 20000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.computer_tech": 10, "research.hyperspace_tech": 6 },
+      "effect": { "research_cost_reduction_pct_per_level": 0.005 }
+    },
+    "lunar_engineering": {
+      "cost": { "m": 50000, "c": 50000, "d": 20000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "building.nanite_factory": 1, "research.astrophysics": 4 },
+      "effect": { "moon_resistance_bonus_pct_per_level": 0.01 }
+    },
+    "climatology": {
+      "cost": { "m": 10000, "c": 20000, "d": 10000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.energy_tech": 8 },
+      "effect": { "negative_event_reduction_pct_per_level": 0.01 }
+    },
+    "pirate_hunting": {
+      "cost": { "m": 3000, "c": 3000, "d": 1000, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.weapon_tech": 3, "research.espionage_tech": 3 },
+      "effect": { "damage_vs_pirates_bonus_pct_per_level": 0.02 }
+    },
+    "death_star": {
+      "cost": { "m": 2000000, "c": 4000000, "d": 2000000, "lu": 100000 },
+      "growth": 1.6,
+      "requires": { "research.lunar_engineering": 8, "research.hyperspace_drive": 12, "research.teleportation": 6, "building.lunar_nanoforge": 10 },
+      "effect": { "moon_move_speed_bonus_pct_per_level": 0.05 }
+    }
+  },
+  "ships": {
+    "light_fighter": {
+      "cost": { "m": 2500, "c": 800, "d": 0, "lu": 0 },
+      "attack": 45,
+      "shield": 12,
+      "hull": 3300,
+      "speed": 13000,
+      "cargo": 60,
+      "fuel": 10,
+      "initiative": 90,
+      "weight": 30,
+      "drive": "combustion",
+      "requires": { "building.crystal_mine": 1, "research.combustion_drive": 1 },
+      "ability": { "swarm": { "target_types": ["battleship", "battlecruiser", "dreadnought"], "dodge_chance": 0.25 } },
+      "matrix": { "light_fighter": 1, "heavy_fighter": 1, "cruiser": 0.5, "battleship": 1, "battlecruiser": 1, "dreadnought": 2, "bomber": 2, "defense": 0.5 }
+    },
+    "heavy_fighter": {
+      "cost": { "m": 5000, "c": 3500, "d": 0, "lu": 0 },
+      "attack": 140,
+      "shield": 30,
+      "hull": 8500,
+      "speed": 11000,
+      "cargo": 120,
+      "fuel": 30,
+      "initiative": 80,
+      "weight": 80,
+      "drive": "impulse",
+      "requires": { "building.crystal_mine": 3, "research.armor_tech": 2, "research.impulse_drive": 2 },
+      "ability": { "piercing": { "shield_ignore_pct": 0.5 } },
+      "matrix": { "light_fighter": 1, "heavy_fighter": 1, "cruiser": 0.5, "battleship": 2, "battlecruiser": 0.5, "dreadnought": 2, "bomber": 1, "defense": 1 }
+    },
+    "cruiser": {
+      "cost": { "m": 18000, "c": 7000, "d": 2000, "lu": 0 },
+      "attack": 380,
+      "shield": 60,
+      "hull": 25000,
+      "speed": 16000,
+      "cargo": 700,
+      "fuel": 120,
+      "initiative": 65,
+      "weight": 250,
+      "drive": "impulse",
+      "requires": { "building.crystal_mine": 5, "research.impulse_drive": 4, "research.ion_tech": 2 },
+      "ability": { "rapid_fire": { "targets": 3, "target_types": ["light_fighter", "heavy_fighter"] } },
+      "matrix": { "light_fighter": 2, "heavy_fighter": 2, "cruiser": 1, "battleship": 0.5, "battlecruiser": 0.5, "dreadnought": 0.5, "bomber": 1, "defense": 1 }
+    },
+    "battleship": {
+      "cost": { "m": 42000, "c": 15000, "d": 0, "lu": 0 },
+      "attack": 1100,
+      "shield": 220,
+      "hull": 57000,
+      "speed": 10500,
+      "cargo": 1400,
+      "fuel": 250,
+      "initiative": 40,
+      "weight": 600,
+      "drive": "hyperspace",
+      "requires": { "building.crystal_mine": 7, "research.hyperspace_drive": 4 },
+      "ability": { "heavy_armor": { "damage_threshold_pct": 0.02, "damage_reduction_pct": 0.5 } },
+      "matrix": { "light_fighter": 1, "heavy_fighter": 0.5, "cruiser": 2, "battleship": 1, "battlecruiser": 2, "dreadnought": 0.5, "bomber": 2, "defense": 1 }
+    },
+    "battlecruiser": {
+      "cost": { "m": 30000, "c": 40000, "d": 15000, "lu": 0 },
+      "attack": 700,
+      "shield": 400,
+      "hull": 70000,
+      "speed": 12000,
+      "cargo": 800,
+      "fuel": 300,
+      "initiative": 100,
+      "weight": 750,
+      "drive": "hyperspace",
+      "requires": { "building.crystal_mine": 8, "research.hyperspace_tech": 5, "research.laser_tech": 12, "research.hyperspace_drive": 5 },
+      "ability": { "first_strike": { "initiative_bonus": 50 } },
+      "matrix": { "light_fighter": 1, "heavy_fighter": 2, "cruiser": 2, "battleship": 0.5, "battlecruiser": 1, "dreadnought": 0.5, "bomber": 1, "defense": 1 }
+    },
+    "dreadnought": {
+      "cost": { "m": 1800000, "c": 1200000, "d": 400000, "lu": 0 },
+      "attack": 18000,
+      "shield": 25000,
+      "hull": 3000000,
+      "speed": 1500,
+      "cargo": 100000,
+      "fuel": 1000,
+      "initiative": 20,
+      "weight": 30000,
+      "drive": "hyperspace",
+      "requires": { "building.crystal_mine": 12, "building.nanite_factory": 1, "research.plasma_tech": 10, "research.armor_tech": 12, "research.hyperspace_drive": 8 },
+      "ability": { "area_damage": { "adjacent_targets": 2, "damage_pct": 0.5 } },
+      "matrix": { "light_fighter": 0.5, "heavy_fighter": 0.5, "cruiser": 2, "battleship": 2, "battlecruiser": 2, "dreadnought": 1, "bomber": 1, "defense": 1 }
+    },
+    "bomber": {
+      "cost": { "m": 48000, "c": 26000, "d": 15000, "lu": 0 },
+      "attack": 950,
+      "shield": 520,
+      "hull": 74000,
+      "speed": 4500,
+      "cargo": 450,
+      "fuel": 700,
+      "initiative": 45,
+      "weight": 700,
+      "drive": "impulse",
+      "requires": { "building.crystal_mine": 8, "research.impulse_drive": 6, "research.plasma_tech": 5 },
+      "ability": { "heavy_payload": { "damage_multiplier_vs_defense_and_slow": 3, "speed_threshold": 5000 } },
+      "matrix": { "light_fighter": 0.5, "heavy_fighter": 1, "cruiser": 1, "battleship": 0.5, "battlecruiser": 1, "dreadnought": 1, "bomber": 1, "defense": 2 }
+    },
+    "carrier": {
+      "cost": { "m": 60000, "c": 40000, "d": 20000, "lu": 0 },
+      "attack": 200,
+      "shield": 300,
+      "hull": 80000,
+      "speed": 8000,
+      "cargo": 2000,
+      "fuel": 400,
+      "initiative": 35,
+      "weight": 5000,
+      "drive": "hyperspace",
+      "requires": { "building.crystal_mine": 9, "research.computer_tech": 8, "research.armor_tech": 8, "research.hyperspace_drive": 6 },
+      "ability": { "hangar": { "capacity": 100000, "allowed_types": ["light_fighter", "heavy_fighter", "espionage_probe"] }, "fighter_penalty_if_destroyed": 0.3 },
+      "matrix": { "light_fighter": 1, "heavy_fighter": 1, "cruiser": 1, "battleship": 1, "battlecruiser": 1, "dreadnought": 1, "bomber": 1, "defense": 1 }
+    },
+    "mothership": {
+      "cost": { "m": 50000000, "c": 40000000, "d": 20000000, "lu": 1000000 },
+      "attack": 50000,
+      "shield": 100000,
+      "hull": 20000000,
+      "speed": 1000,
+      "cargo": 10000000,
+      "fuel": 5000,
+      "initiative": 15,
+      "weight": 0,
+      "drive": "hyperspace",
+      "requires": { "building.lunar_shipyard": 8, "building.nanite_factory": 3, "research.hyperspace_tech": 12, "research.hyperspace_drive": 12, "research.computer_tech": 12, "research.research_network": 1 },
+      "ability": { "max_one_per_empire": true, "hangar_capacity": 1000000000, "hangar_allowed_all_except_mothership": true, "fleet_aura": { "attack_bonus_pct": 0.1, "shield_bonus_pct": 0.1, "initiative_bonus_pct": 0.1 }, "fleet_repair_pct": 0.2, "rebuild_cooldown_days": 7 },
+      "matrix": { "light_fighter": 1, "heavy_fighter": 1, "cruiser": 1, "battleship": 1, "battlecruiser": 1, "dreadnought": 1, "bomber": 1, "defense": 1 }
+    },
+    "small_cargo": {
+      "cost": { "m": 2200, "c": 2200, "d": 0, "lu": 0 },
+      "attack": 4,
+      "shield": 10,
+      "hull": 4400,
+      "speed": 5500,
+      "cargo": 5500,
+      "fuel": 10,
+      "initiative": 50,
+      "weight": 50,
+      "drive": "combustion",
+      "requires": { "building.crystal_mine": 2, "research.combustion_drive": 2 },
+      "ability": { "speed_with_impulse_5": 11000 },
+      "matrix": { "light_fighter": 1, "heavy_fighter": 1, "cruiser": 1, "battleship": 1, "battlecruiser": 1, "dreadnought": 1, "bomber": 1, "defense": 1 }
+    },
+    "large_cargo": {
+      "cost": { "m": 6500, "c": 6500, "d": 0, "lu": 0 },
+      "attack": 6,
+      "shield": 25,
+      "hull": 13000,
+      "speed": 7800,
+      "cargo": 26000,
+      "fuel": 40,
+      "initiative": 45,
+      "weight": 150,
+      "drive": "combustion",
+      "requires": { "building.crystal_mine": 4, "research.combustion_drive": 6 },
+      "ability": {},
+      "matrix": { "light_fighter": 1, "heavy_fighter": 1, "cruiser": 1, "battleship": 1, "battlecruiser": 1, "dreadnought": 1, "bomber": 1, "defense": 1 }
+    },
+    "colony_ship": {
+      "cost": { "m": 9000, "c": 18000, "d": 9000, "lu": 0 },
+      "attack": 0,
+      "shield": 90,
+      "hull": 27000,
+      "speed": 2600,
+      "cargo": 7000,
+      "fuel": 500,
+      "initiative": 10,
+      "weight": 400,
+      "drive": "impulse",
+      "requires": { "building.crystal_mine": 4, "research.impulse_drive": 3, "research.astrophysics": 1 },
+      "ability": { "founds_colony": true, "cargo_is_initial_resources": true },
+      "matrix": { "light_fighter": 1, "heavy_fighter": 1, "cruiser": 1, "battleship": 1, "battlecruiser": 1, "dreadnought": 1, "bomber": 1, "defense": 1 }
+    },
+    "espionage_probe": {
+      "cost": { "m": 0, "c": 900, "d": 0, "lu": 0 },
+      "attack": 0,
+      "shield": 0,
+      "hull": 900,
+      "speed": 80000000,
+      "cargo": 0,
+      "fuel": 1,
+      "initiative": 99,
+      "weight": 5,
+      "drive": "combustion",
+      "requires": { "building.crystal_mine": 3, "research.combustion_drive": 3, "research.espionage_tech": 2 },
+      "ability": {},
+      "matrix": { "light_fighter": 1, "heavy_fighter": 1, "cruiser": 1, "battleship": 1, "battlecruiser": 1, "dreadnought": 1, "bomber": 1, "defense": 1 }
+    },
+    "recycler": {
+      "cost": { "m": 9000, "c": 5500, "d": 2000, "lu": 0 },
+      "attack": 1,
+      "shield": 10,
+      "hull": 14500,
+      "speed": 2200,
+      "cargo": 18000,
+      "fuel": 150,
+      "initiative": 10,
+      "weight": 200,
+      "drive": "combustion",
+      "requires": { "building.crystal_mine": 4, "research.combustion_drive": 6, "research.shield_tech": 2 },
+      "ability": { "collects_debris": true },
+      "matrix": { "light_fighter": 1, "heavy_fighter": 1, "cruiser": 1, "battleship": 1, "battlecruiser": 1, "dreadnought": 1, "bomber": 1, "defense": 1 }
+    },
+    "miner": {
+      "cost": { "m": 8000, "c": 4000, "d": 1000, "lu": 0 },
+      "attack": 0,
+      "shield": 50,
+      "hull": 12000,
+      "speed": 6000,
+      "cargo": 50000,
+      "fuel": 60,
+      "initiative": 0,
+      "weight": 120,
+      "drive": "combustion",
+      "requires": { "building.crystal_mine": 4, "research.mining_tech": 1, "research.astrophysics": 2 },
+      "ability": { "extracts_per_hour": 2000 },
+      "matrix": { "light_fighter": 1, "heavy_fighter": 1, "cruiser": 1, "battleship": 1, "battlecruiser": 1, "dreadnought": 1, "bomber": 1, "defense": 1 }
+    }
+  },
+  "defenses": {
+    "flak_battery": {
+      "cost": { "m": 2000, "c": 0, "d": 0, "lu": 0 },
+      "against": "light_fighter",
+      "attack": 20,
+      "shield": 25,
+      "hull": 2000,
+      "initiative": 70,
+      "ability": { "targets": 5, "multiplier_vs_target": 4 },
+      "weak_against": ["battleship", "bomber"],
+      "requires": { "building.crystal_mine": 1 }
+    },
+    "pulse_laser": {
+      "cost": { "m": 2500, "c": 1000, "d": 0, "lu": 0 },
+      "against": "heavy_fighter",
+      "attack": 120,
+      "shield": 30,
+      "hull": 3500,
+      "initiative": 75,
+      "ability": { "negates_dodge": true, "multiplier_vs_target": 4 },
+      "weak_against": ["cruiser"],
+      "requires": { "building.crystal_mine": 2, "research.energy_tech": 1, "research.laser_tech": 3 }
+    },
+    "ion_cannon": {
+      "cost": { "m": 6000, "c": 4000, "d": 0, "lu": 0 },
+      "against": "cruiser",
+      "attack": 180,
+      "shield": 400,
+      "hull": 10000,
+      "initiative": 50,
+      "ability": { "shield_damage_multiplier": 2, "multiplier_vs_target": 4 },
+      "weak_against": ["battleship", "dreadnought"],
+      "requires": { "building.crystal_mine": 4, "research.ion_tech": 4 }
+    },
+    "rail_gun": {
+      "cost": { "m": 18000, "c": 8000, "d": 1000, "lu": 0 },
+      "against": "battleship",
+      "attack": 900,
+      "shield": 150,
+      "hull": 26000,
+      "initiative": 40,
+      "ability": { "ignores_heavy_armor": true, "multiplier_vs_target": 3 },
+      "weak_against": ["heavy_fighter", "bomber"],
+      "requires": { "building.crystal_mine": 6, "research.energy_tech": 6, "research.weapon_tech": 5, "research.shield_tech": 2 }
+    },
+    "sentinel_turret": {
+      "cost": { "m": 25000, "c": 20000, "d": 5000, "lu": 0 },
+      "against": "battlecruiser",
+      "attack": 600,
+      "shield": 250,
+      "hull": 45000,
+      "initiative": 160,
+      "ability": { "multiplier_vs_target": 4 },
+      "weak_against": ["dreadnought"],
+      "requires": { "building.crystal_mine": 7, "research.computer_tech": 8, "research.laser_tech": 10 }
+    },
+    "sam_site": {
+      "cost": { "m": 8000, "c": 6000, "d": 2000, "lu": 0 },
+      "against": "bomber",
+      "attack": 300,
+      "shield": 100,
+      "hull": 14000,
+      "initiative": 85,
+      "ability": { "multiplier_vs_target": 5, "negates_heavy_payload": true },
+      "weak_against": ["cruiser", "battlecruiser"],
+      "requires": { "building.crystal_mine": 4, "research.impulse_drive": 3, "research.computer_tech": 3 }
+    },
+    "torpedo_platform": {
+      "cost": { "m": 40000, "c": 25000, "d": 10000, "lu": 0 },
+      "against": "carrier",
+      "attack": 2500,
+      "shield": 200,
+      "hull": 60000,
+      "initiative": 55,
+      "ability": { "fires_before_hangar_launch": true, "carrier_destroyed_loses_contents": true, "multiplier_vs_target": 5 },
+      "weak_against": ["heavy_fighter", "bomber"],
+      "requires": { "building.crystal_mine": 8, "research.impulse_drive": 7, "research.weapon_tech": 8 }
+    },
+    "plasma_lance": {
+      "cost": { "m": 60000, "c": 50000, "d": 30000, "lu": 0 },
+      "against": "dreadnought",
+      "attack": 4000,
+      "shield": 500,
+      "hull": 100000,
+      "initiative": 25,
+      "ability": { "extra_damage_pct_of_target_structure": 0.01 },
+      "weak_against": ["light_fighter", "bomber"],
+      "requires": { "building.crystal_mine": 10, "research.plasma_tech": 8 }
+    },
+    "graviton_cannon": {
+      "cost": { "m": 5000000, "c": 4000000, "d": 2000000, "lu": 0 },
+      "against": "mothership",
+      "attack": 250000,
+      "shield": 20000,
+      "hull": 2000000,
+      "initiative": 10,
+      "ability": { "negates_aura": true, "multiplier_vs_target": 10, "max_one_per_planet": true, "energy_cost": 500 },
+      "weak_against": ["light_fighter", "heavy_fighter"],
+      "requires": { "building.crystal_mine": 14, "building.nanite_factory": 2, "research.hyperspace_drive": 12, "research.plasma_tech": 12 }
+    },
+    "planetary_shield": {
+      "cost": { "m": 20000, "c": 20000, "d": 0, "lu": 0 },
+      "against": "all",
+      "attack": 0,
+      "shield": 50000,
+      "hull": 0,
+      "initiative": 0,
+      "ability": { "absorbs_before_defenses": true, "regenerates_per_round": true, "max_one_per_planet": true, "energy_cost": 100, "shield_bonus_per_shield_tech_level": 0.1 },
+      "weak_against": [],
+      "requires": { "building.crystal_mine": 3, "research.shield_tech": 4 }
+    },
+    "anti_ballistic_missile": {
+      "cost": { "m": 8000, "c": 0, "d": 2000, "lu": 0 },
+      "against": "missiles",
+      "attack": 0,
+      "shield": 0,
+      "hull": 0,
+      "initiative": 0,
+      "ability": { "intercepts_one_missile": true, "failure_chance": 0.1, "silo_slot": 1 },
+      "weak_against": [],
+      "requires": { "building.missile_silo": 2 }
+    },
+    "interplanetary_missile": {
+      "cost": { "m": 12500, "c": 2500, "d": 10000, "lu": 0 },
+      "against": "defenses",
+      "attack": 1000000,
+      "shield": 0,
+      "hull": 0,
+      "initiative": 0,
+      "ability": { "silo_slot": 1, "ignores_shields": true, "damage_bonus_per_weapon_tech_pct": 0.1, "damage_bonus_per_ballistics_pct": 0.02, "range_systems_base": 5, "range_per_impulse_level": 1 },
+      "weak_against": [],
+      "requires": { "building.missile_silo": 4, "research.impulse_drive": 1 }
+    }
+  },
+  "missiles": {
+    "anti_ballistic_missile": {
+      "cost": { "m": 8000, "c": 0, "d": 2000, "lu": 0 },
+      "damage": 0,
+      "speed": 80000000,
+      "range_base": 0,
+      "range_per_impulse": 0,
+      "range_per_missile_factory": 0,
+      "requires": { "building.missile_silo": 2 }
+    },
+    "interplanetary_missile": {
+      "cost": { "m": 12500, "c": 2500, "d": 10000, "lu": 0 },
+      "damage": 1000000,
+      "speed": 80000000,
+      "range_base": 5,
+      "range_per_impulse": 1,
+      "range_per_missile_factory": 0.5,
+      "requires": { "building.missile_silo": 4, "research.impulse_drive": 1 }
+    }
+  },
+  "upgrades": {
+    "branches": {
+      "attack": { "attack_bonus_pct_per_level": 0.02 },
+      "defense": { "shield_bonus_pct_per_level": 0.02, "hull_bonus_pct_per_level": 0.02 },
+      "engines": { "speed_bonus_pct_per_level": 0.02, "fuel_reduction_pct_per_level": 0.01, "initiative_bonus_pct_per_level": 0.02, "dodge_bonus_pct_per_level": 0.005, "max_dodge_pct": 0.4 },
+      "cargo": { "cargo_bonus_pct_per_level": 0.03 },
+      "hangar": { "hangar_capacity_bonus_pct_per_level": 0.05 },
+      "extraction": { "miner_extraction_bonus_pct_per_level": 0.03 },
+      "depth": { "miner_extra_stratum_per_level": 1 },
+      "readiness": { "initiative_bonus_pct_per_level": 0.02 }
+    },
+    "cost_multiplier": 1.25,
+    "lunarite_from_level": 11,
+    "lunarite_base": 50,
+    "lunarite_growth": 1.25
+  },
+  "combat": {
+    "max_rounds": 6,
+    "initiative_group": 10,
+    "shield_bounce_threshold": 0.01,
+    "explosion_threshold": 0.3,
+    "max_dodge": 0.4,
+    "debris_ship_pct": 0.3,
+    "debris_defense_pct": 0.1,
+    "debris_decay_per_day": 0.05
+  },
+  "fleet": {
+    "base_fleets": 1,
+    "computer_per_fleet": 1,
+    "fleet_command_per_fleet": 3,
+    "admiral_command_per_fleet": 5,
+    "distance_same_system_base": 100,
+    "distance_same_system_per_pos": 10,
+    "distance_diff_system": 1000,
+    "distance_diff_galaxy": 200000,
+    "time_factor": 3600,
+    "fuel_distance_divisor": 1000,
+    "fuel_speed_exponent": 2,
+    "hold_seconds": 30,
+    "anti_brush_limit": 3,
+    "anti_brush_hours": 24
+  },
+  "moon": {
+    "base_fields": 1000,
+    "fields_per_nanoforge_level": 200,
+    "resistance_base_metal": 5000000,
+    "resistance_base_crystal": 2000000,
+    "resistance_base_deut": 0,
+    "resistance_bulwark_per_level": 0.1,
+    "resistance_armor_per_level": 0.02,
+    "repair_per_hour": 0.02,
+    "repair_orbital_dock_per_level": 0.02,
+    "repair_lunar_shipyard_per_level": 0.0025,
+    "emergency_repair_hours": 6,
+    "destroyed_cooldown_hours": 48,
+    "debris_from_destroy_pct": 0.2,
+    "move_speed_base": 10,
+    "move_speed_per_death_star_level": 0.05,
+    "galaxy_jump_systems": 200,
+    "recharge_hours": 24,
+    "nanoforge_requires": { "research.lunar_engineering": 1, "building.nanite_factory": 1 }
+  },
+  "power": {
+    "offense_weight": 1.0,
+    "defense_weight": 6.0,
+    "shield_weight": 6.0,
+    "dodge_weight": 1.0,
+    "structure_weight_research": 1.0,
+    "structure_weight_building": 1.0,
+    "admiral_medal_weight": 10.0,
+    "missile_in_silo": 350.0,
+    "coalition_threshold": 3.0
+  },
+  "cpu": {
+    "max_live_empires": 150,
+    "live_share_pct": 0.7,
+    "resource_multiplier_max": 1.0,
+    "research_multiplier_max": 1.0,
+    "difficulty_levels": ["easy", "normal", "hard", "expert"],
+    "personalities": {
+      "aggressive": { "moon_focus": "attack_base", "upgrade_focus": "attack", "missile_strategy": "pre_attack", "market_behavior": "sell_for_fleet", "pirate_gauntlet": "warp_often", "moon_destruction": true },
+      "defensive": { "moon_focus": "bulwark_defense", "upgrade_focus": "defense", "missile_strategy": "many_abm", "market_behavior": "few_offers", "pirate_gauntlet": "rare", "moon_destruction": false },
+      "economic": { "moon_focus": "lunarite_deuterium", "upgrade_focus": "cargo", "missile_strategy": "few", "market_behavior": "many_offers", "pirate_gauntlet": "rift", "moon_destruction": false },
+      "technological": { "moon_focus": "upgrade_forge", "upgrade_focus": "balanced", "missile_strategy": "medium", "market_behavior": "buy_lunarite", "pirate_gauntlet": "warp_gauntlet", "moon_destruction": "rare" },
+      "opportunistic": { "moon_focus": "phalanx_decoy", "upgrade_focus": "engines", "missile_strategy": "frequent", "market_behavior": "buy_at_minimum", "pirate_gauntlet": "rift", "moon_destruction": "damaged_moons" }
+    },
+    "simple_tiers": {
+      "inactive": { "mine_level_factor": 0.5 },
+      "weak": { "mine_level_factor": 1.0 },
+      "medium": { "mine_level_factor": 1.5 }
+    }
+  },
+  "pirates": {
+    "base_power": 50000,
+    "power_growth": 1.18,
+    "rift_per_day": 2,
+    "rift_duration_hours": 6,
+    "rift_power_pct_min": 0.15,
+    "rift_power_pct_max": 0.3,
+    "warp_position": 16
+  },
+  "gauntlet": {
+    "base_power": 30000,
+    "power_growth": 1.12,
+    "medal_base": 1.1,
+    "medal_growth": 1.1,
+    "requires_moon": true,
+    "retreat_max_wave": 100,
+    "retreat_max_loss_pct": 0.5,
+    "retreat_min_rel_power": 0.5
+  },
+  "admiral": {
+    "base_cost": 10,
+    "cost_growth": 1.15,
+    "skills": {
+      "tactics": { "attack_bonus_pct_per_level": 0.01 },
+      "defense": { "shield_bonus_pct_per_level": 0.01, "hull_bonus_pct_per_level": 0.01 },
+      "initiative": { "initiative_bonus_pct_per_level": 0.01 },
+      "logistics": { "speed_bonus_pct_per_level": 0.01, "fuel_reduction_pct_per_level": 0.01 },
+      "looting": { "cargo_bonus_pct_per_level": 0.01 },
+      "command": { "extra_fleet_per_5_levels": 1 },
+      "pirate_hunter": { "damage_vs_pirates_bonus_pct_per_level": 0.02 },
+      "engineer": { "upgrade_time_reduction_pct_per_level": 0.01 }
+    }
+  },
+  "mining": {
+    "base_reserve": 100000,
+    "reserve_growth": 1.2,
+    "lunarite_fraction": 0.1,
+    "base_extraction_per_hour": 2000,
+    "extraction_upgrade_pct": 0.03,
+    "mining_tech_pct": 0.01,
+    "mining_control_strata_per_level": 1,
+    "depth_base_strata": 1,
+    "soft_asteroid_extra_strata": 3,
+    "soft_asteroid_speed_bonus": 0.5,
+    "contested_loss_cargo_pct": 1.0,
+    "contested_loss_ships_pct": 0.5,
+    "field_per_day": 3,
+    "field_duration_hours": 12
+  },
+  "market": {
+    "base_rates": { "crystal_to_metal": 2, "deuterium_to_metal": 3, "lunarite_to_metal": 10 },
+    "rate_recovery_per_hour": 0.02,
+    "liquidity": 1000000,
+    "trade_center_rate_bonus_per_level": 0.02,
+    "galactic_economy_rate_bonus_per_level": 0.01
+  },
+  "diplomacy": {
+    "status_thresholds": { "war": -50, "hostile": -10, "neutral": 9, "friendly": 49, "ally": 50 },
+    "pact_types": ["non_aggression", "alliance", "tribute"],
+    "coalition_power_threshold": 3.0
+  },
+  "events": {
+    "enabled": true,
+    "probabilities": {
+      "pirate_attack": 0.01,
+      "meteorite": 0.005,
+      "rich_deposit": 0.003,
+      "drifting_wreck": 0.003,
+      "solar_storm": 0.002,
+      "scientific_discovery": 0.001,
+      "mercenaries": 0.002,
+      "rebellion": 0.001,
+      "anomaly": 0.001
+    },
+    "weather_control_reduction_per_level": 0.05,
+    "climatology_reduction_per_level": 0.01
+  },
+  "log": {
+    "retention_events_days": 30,
+    "retention_reports_days": 90
+  },
+  "format": {
+    "scale": ["k", "Mln", "Mld", "Bln", "Bld", "Tln", "Tld", "Qln", "Qld", "Qnl", "Qnd", "Sln", "Sld"],
+    "decimal_separator": ",",
+    "thousands_separator": ".",
+    "decimals": 2
+  },
+  "realtime": {
+    "moon_destroyed_cooldown_hours": 48,
+    "moon_move_recharge_hours": 24,
+    "mothership_rebuild_days": 7,
+    "asteroid_reset_timezone": "Europe/Rome",
+    "asteroid_reset_hour": 0,
+    "rift_per_day": 2,
+    "field_per_day": 3
+  }
+}
