@@ -50,10 +50,12 @@
       "lunarite": 0
     },
     "storage": {
-      "metal": { "base": 10000, "growth": 1.7 },
-      "crystal": { "base": 10000, "growth": 1.7 },
-      "deuterium": { "base": 10000, "growth": 1.7 },
-      "lunarite": { "base": 2000, "growth": 1.7 }
+      "cost_growth": 1.7,
+      "capacity_growth": 1.6,
+      "metal": { "base": 10000 },
+      "crystal": { "base": 10000 },
+      "deuterium": { "base": 10000 },
+      "lunarite": { "base": 2000 }
     },
     "protected_percentage": 0.1,
     "bunker_bonus_per_level": 0.05,
@@ -146,6 +148,30 @@
       "requires": { "research.orbital_tech": 2 },
       "energy": { "flat_per_level": 0 },
       "effect": { "capacity": { "a": 5000, "b": 1.6 } },
+      "fields": 1
+    },
+    "metal_storage": {
+      "cost": { "m": 1000, "c": 0, "d": 0, "lu": 0 },
+      "growth": 1.7,
+      "requires": {},
+      "energy": { "flat_per_level": 0 },
+      "effect": { "capacity": { "a": 10000, "b": 1.6 } },
+      "fields": 1
+    },
+    "crystal_storage": {
+      "cost": { "m": 1000, "c": 500, "d": 0, "lu": 0 },
+      "growth": 1.7,
+      "requires": {},
+      "energy": { "flat_per_level": 0 },
+      "effect": { "capacity": { "a": 10000, "b": 1.6 } },
+      "fields": 1
+    },
+    "deuterium_tank": {
+      "cost": { "m": 1000, "c": 1000, "d": 0, "lu": 0 },
+      "growth": 1.7,
+      "requires": {},
+      "energy": { "flat_per_level": 0 },
+      "effect": { "capacity": { "a": 10000, "b": 1.6 } },
       "fields": 1
     },
     "robot_factory": {
@@ -407,7 +433,7 @@
       "fields": 1
     },
     "lunarite_vault": {
-      "cost": { "m": 0, "c": 0, "d": 0, "lu": 0 },
+      "cost": { "m": 5000, "c": 5000, "d": 0, "lu": 0 },
       "growth": 1.7,
       "requires": { "building.lunarite_extractor": 1 },
       "energy": { "flat_per_level": 0 },
