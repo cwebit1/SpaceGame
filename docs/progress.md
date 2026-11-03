@@ -44,10 +44,11 @@
 ---
 
 ### Task 5: Login, partite, generazione galassia
-- [ ] Step 1: Test: `test_density_matches_setting` (±2%), `test_live_share_70_percent` (±3%), `test_live_empires_capped`, `test_cpu_planet_fields_scaled` (al 50% = 1000), `test_player_home_has_2000_fields`, `test_every_system_has_warp_and_4_asteroids`, `test_settings_out_of_range_rejected` (speed 101, cpu mult > speed), `test_config_copied_into_game`.
-- [ ] Step 2-4: FAIL → implementa → PASS. Commit.
+- [x] Step 1: Test: `test_density_matches_setting` (±2%), `test_live_share_70_percent` (±3%), `test_live_empires_capped`, `test_cpu_planet_fields_scaled` (al 50% = 1000), `test_player_home_has_2000_fields`, `test_every_system_has_warp_and_4_asteroids`, `test_settings_out_of_range_rejected` (speed 101, cpu mult > speed), `test_config_copied_into_game`.
+- [x] Step 2-4: FAIL → implementa → PASS. Commit.
 
-**Stato:** IN ATTESA
+**Commit:** 80869e0
+**Stato:** COMPLETATO
 
 ---
 
