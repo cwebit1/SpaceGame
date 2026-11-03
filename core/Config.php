@@ -59,6 +59,21 @@ final class Config
     }
 
     /**
+     * Crea una configurazione da stringa JSON.
+     */
+    public static function fromJson(string $json): self
+    {
+        $data = json_decode($json, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new ConfigError("JSON non valido: " . json_last_error_msg());
+        }
+        if (!is_array($data)) {
+            throw new ConfigError("Il JSON deve contenere un oggetto");
+        }
+        return new self($data, 'json');
+    }
+
+    /**
      * Recupera un valore usando notazione dot-path.
      * Lancia ConfigError con il percorso se la chiave non esiste.
      */
