@@ -55,7 +55,11 @@
 ## Milestone B — Tempo, economia, code
 
 ### Task 6: Clock ed EventBus
-- [ ] ...
+- [x] Step 1: Test: `test_events_run_in_time_order`, `test_chunked_equals_single_pass` (stessa partita clonata: un `catchUp` vs 50 chiamate con budget minimo → stato DB identico), `test_event_processed_once` (due catchUp concorrenti simulati → handler chiamato 1 volta), `test_returns_false_when_budget_exhausted`.
+- [x] Step 2-4: FAIL → implementa → PASS. Commit.
+
+**Commit:** 8b45131
+**Stato:** COMPLETATO
 
 ## Milestone C — Unità
 
