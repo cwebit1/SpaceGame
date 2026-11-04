@@ -114,6 +114,27 @@ try {
 
     $pdo->exec('SET FOREIGN_KEY_CHECKS = 1');
 
+    // Crea utente admin se configurato
+    if (isset($fullConfig['admin']) && is_array($fullConfig['admin'])) {
+        $adminConfig = $fullConfig['admin'];
+        $username = trim($adminConfig['username'] ?? '');
+        $password = $adminConfig['password'] ?? '';
+
+        if ($username !== '' && $password !== '') {
+            // Verifica se l'utente esiste già
+            $stmt = $pdo->prepare("SELECT `id` FROM `users` WHERE `username` = ?");
+            $stmt->execute([$username]);
+            if (!$stmt->fetch()) {
+                $hash = password_hash($password, PASSWORD_DEFAULT);
+                $stmt = $pdo->prepare("INSERT INTO `users` (`username`, `pass_hash`) VALUES (?, ?)");
+                $stmt->execute([$username, $hash]);
+                echo "Utente admin '$username' creato.\n";
+            } else {
+                echo "Utente admin '$username' già esistente.\n";
+            }
+        }
+    }
+
     echo "\n✓ Installazione completata con successo!\n";
     echo "Tabelle create nel database '$dbName'.\n";
 
