@@ -43,7 +43,8 @@ final class GamesController
         self::requireAuth();
         self::requireCsrf();
 
-        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        // Use cached parsed input if available (from requireCsrf)
+        $input = $_SERVER['PARSED_JSON_INPUT'] ?? json_decode(file_get_contents('php://input'), true) ?? [];
         $settings = $input['settings'] ?? [];
 
         if (!is_array($settings)) {
@@ -146,7 +147,7 @@ final class GamesController
             return;
         }
 
-        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $input = $_SERVER['PARSED_JSON_INPUT'] ?? json_decode(file_get_contents('php://input'), true) ?? [];
         $seed = $input['seed'] ?? null;
 
         try {
@@ -203,7 +204,24 @@ final class GamesController
 
     private static function requireCsrf(): void
     {
+        // Check header first (for AJAX)
         $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+
+        // Check form field (for traditional forms)
+        if ($token === '') {
+            $token = $_POST['csrf_token'] ?? '';
+        }
+
+        // Check JSON body (for JSON API)
+        if ($token === '') {
+            $input = json_decode(file_get_contents('php://input'), true);
+            if (is_array($input)) {
+                $token = $input['csrf_token'] ?? '';
+                // Store parsed input for reuse by calling method
+                $_SERVER['PARSED_JSON_INPUT'] = $input;
+            }
+        }
+
         if ($token === '') {
             self::json(['ok' => false, 'error' => 'Token CSRF mancante'], 400);
             exit;
