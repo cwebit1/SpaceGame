@@ -192,8 +192,9 @@ class GalaxyTest extends TestCase
 
         $pdo = Db::pdo(true);
         $stmt = $pdo->prepare("
-            SELECT `fields_base` FROM `bodies`
-            WHERE `game_id` = ? AND `empire_id` IS NOT NULL AND `is_moon` = 0
+            SELECT b.`fields_base` FROM `bodies` b
+            JOIN `empires` e ON b.`empire_id` = e.`id`
+            WHERE b.`game_id` = ? AND e.`kind` IN ('cpu', 'simple') AND b.`is_moon` = 0
             LIMIT 10
         ");
         $stmt->execute([$gameId]);

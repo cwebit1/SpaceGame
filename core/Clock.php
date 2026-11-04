@@ -33,16 +33,17 @@ final class Clock
      * @param int $gameId ID della partita
      * @param float $now Timestamp Unix corrente (secondi, float)
      * @param float $budgetSec Budget in secondi reali per questa chiamata (es. 0.05 = 50ms)
+     * @param bool $test Usa database di test
      * @return true se tutti gli eventi fino a $now sono stati elaborati, false se il budget è esaurito
      */
-    public static function catchUp(int $gameId, float $now, float $budgetSec): bool
+    public static function catchUp(int $gameId, float $now, float $budgetSec, bool $test = false): bool
     {
         $startTime = microtime(true);
         $budgetEnd = $startTime + $budgetSec;
 
         // Usa lock per partita per evitare elaborazione concorrente
-        return Db::withGameLock($gameId, function () use ($gameId, $now, $budgetEnd, $startTime): bool {
-            $pdo = Db::pdo();
+        return Db::withGameLock($gameId, function () use ($gameId, $now, $budgetEnd, $startTime, $test): bool {
+            $pdo = Db::pdo($test);
             // Carica configurazione e dati partita
             $stmt = $pdo->prepare("SELECT `settings_json`, `config_json`, `processed_until` FROM `games` WHERE `id` = ?");
             $stmt->execute([$gameId]);

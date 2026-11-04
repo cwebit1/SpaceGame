@@ -7,7 +7,7 @@ Sei lo sviluppatore di SpaceGame.
    - `docs/superpowers/plans/2026-11-02-spacegame.md` (piano)
    - `docs/progress.md` (avanzamento; se non esiste, crealo)
    - le cartelle in `docs/reviews/` (revisioni esterne di Qwen: `milestone-X/errori.md` e `milestone-X/soluzioni.md`)
-2. **Revisioni prima di tutto.** Se in `docs/reviews/` c'è una cartella `milestone-X` non ancora segnata come "gestita" in `docs/progress.md`:
+2. **Revisioni prima di tutto.** Una revisione è **pronta** solo se `errori.md` e `soluzioni.md` contengono le risposte di Qwen. Se un file manca, è vuoto o contiene ancora il prompt (inizia con "Sei un revisore" o "Ora, per ogni errore"), la revisione **non è pronta**: saltala senza toccare quei file (niente commit, niente "gestita", niente "## Esito") e passa al punto 3. La revisione e il lavoro sulle milestone vanno in parallelo: non aspettare Qwen. Una revisione è **già gestita** (e non va mai ritrattata) se `docs/progress.md` la segna come "gestita" **oppure** `soluzioni.md` contiene già la sezione `## Esito`. Se in `docs/reviews/` c'è una cartella `milestone-X` **pronta** e **non già gestita**:
    - fai subito commit e push dei due file così come sono (`git add docs/reviews/milestone-X` → `git commit -m "docs: review Qwen milestone X"` → `git push origin master`);
    - per ogni errore di gravità **alta** e **media** in `errori.md` applica la soluzione proposta in `soluzioni.md` (o una migliore, spiegando perché), con TDD, test verdi, commit `fix(review): …`; se un errore ti sembra infondato spiega il motivo;
    - in fondo a `soluzioni.md` aggiungi la sezione `## Esito` con, per ogni errore: corretto (commit) / non corretto (motivo);
@@ -19,7 +19,7 @@ Sei lo sviluppatore di SpaceGame.
    - nessun numero di gioco nel codice: tutto in `game_config.json`, copiato dalla specifica;
    - non inserire mai credenziali (`config.local.php` lo compila l'utente; in locale DB `root` senza password su `127.0.0.1`);
    - spunta le caselle `- [x]` del piano man mano;
-   - nei comandi Bash usa percorsi relativi alla cartella del progetto o con `/`, mai con `\` (altrimenti il controllo dei permessi non li riconosce e chiede conferma);
+   - nei comandi Bash usa percorsi relativi alla cartella del progetto o con `/`, mai con `\` (altrimenti il controllo dei permessi non li riconosce e chiede conferma); non usare `cd` (sei già nella cartella del progetto): i test si lanciano con `php vendor/bin/phpunit …` e `node tests/js/…`;
    - lancia test e comandi **in primo piano** e leggi direttamente il loro output: mai `sleep`, mai comandi in background, mai `cat` di file di output in cartelle temporanee; usa solo percorsi dentro il progetto;
    - mai scrivere più di circa 150 righe in una sola scrittura: i file grandi (es. `game_config.json`, schema SQL, PWA) vanno creati a sezioni, prima lo scheletro e poi una sezione per volta con Edit, verificando dopo ogni sezione (le risposte troppo lunghe vanno in timeout sul provider).
 5. Fermati prima della fine **solo** se: un valore della specifica manca o è ambiguo, oppure i test non passano dopo 3 tentativi. In quel caso spiega il problema e aspetta.

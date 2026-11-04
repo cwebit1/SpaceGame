@@ -358,6 +358,16 @@ final class BuildController
     private static function json(array $data, int $status = 200): void
     {
         http_response_code($status);
+
+        // CORS headers (E22)
+        $config = Config::fromFile(__DIR__ . '/../../game_config.json');
+        $corsOrigin = $config->get('security.cors_allowed_origin') ?? '*';
+        header('Access-Control-Allow-Origin: ' . $corsOrigin);
+        header('Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS');
+        header('Access-Control-Allow-Headers: Content-Type, X-CSRF-Token');
+        header('Access-Control-Allow-Credentials: true');
+        header('Access-Control-Max-Age: 86400');
+
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode($data, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;

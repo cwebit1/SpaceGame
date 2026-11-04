@@ -42,19 +42,21 @@ final class Formula
     }
 
     /**
-     * Ore di costruzione: (m+c+d)/3000 / speedDivisor * naniteFactor^nanite / gameSpeed
+     * Ore di costruzione: (m+c+d)/divisor / speedDivisor * naniteFactor^nanite / gameSpeed
      * - cost: array con m, c, d, lu
      * - speedDivisor: 1 + 0.15*Robot (edifici) o 1 + 0.2*Shipyard (navi) ecc.
      * - nanite: livello Fabbrica di naniti
      * - gameSpeed: velocità della partita
      * - naniteFactor: 0.25 (da config)
+     * - config: Config con formula.construction_cost_divisor (default 3000)
      */
     public static function buildHours(
         array $cost,
         float $speedDivisor,
         int $nanite,
         float $gameSpeed,
-        float $naniteFactor
+        float $naniteFactor,
+        Config $config
     ): float {
         $totalCost = ($cost['m'] ?? 0) + ($cost['c'] ?? 0) + ($cost['d'] ?? 0);
         if ($totalCost <= 0) {
@@ -62,7 +64,8 @@ final class Formula
         }
 
         $naniteMultiplier = pow($naniteFactor, $nanite);
-        return ($totalCost / 3000.0) / $speedDivisor * $naniteMultiplier / $gameSpeed;
+        $divisor = (float)$config->get('formula.construction_cost_divisor', 3000.0);
+        return ($totalCost / $divisor) / $speedDivisor * $naniteMultiplier / $gameSpeed;
     }
 
     /**

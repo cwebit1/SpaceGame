@@ -1,6 +1,6 @@
 @echo off
 rem Avvia l'ambiente di sviluppo di SpaceGame e una NUOVA sessione dell'agente (una per milestone).
-rem L'agente non chiede conferma tra un task e l'altro; i permessi normali di Claude restano attivi.
+rem Auto mode: i comandi innocui passano senza domande, quelli rischiosi li blocca il classificatore; i deny di .claude/settings.json restano validi.
 setlocal
 cd /d D:\CweAgent\projects\SpaceGame
 
@@ -37,7 +37,7 @@ set "TMP=D:\CweAgent\projects\SpaceGame\.tmp"
 set "CLAUDE_CODE_TMPDIR=D:\CweAgent\projects\SpaceGame\.tmp"
 
 rem 4) Nuova sessione dell'agente sulla prossima milestone
-call "D:\CweAgent\tools\free-claude-code\fcc-claude.cmd" --permission-mode acceptEdits %* "Leggi docs/PROMPT-MILESTONE.md e seguilo alla lettera."
+call "D:\CweAgent\tools\free-claude-code\fcc-claude.cmd" --permission-mode auto %* "Leggi docs/PROMPT-MILESTONE.md e seguilo alla lettera."
 exit /b 0
 
 :fcc_up

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SpaceGame\Tests;
 
 use PHPUnit\Framework\TestCase;
+use SpaceGame\Config;
 use SpaceGame\Formula;
 
 /**
@@ -12,6 +13,16 @@ use SpaceGame\Formula;
  */
 final class FormulaTest extends TestCase
 {
+    private Config $config;
+
+    protected function setUp(): void
+    {
+        $this->config = Config::fromArray([
+            'formula' => [
+                'construction_cost_divisor' => 3000,
+            ],
+        ]);
+    }
     public function test_levelCurve(): void
     {
         // levelCurve(40, 1.08, 10) = 40 * 10 * 1.08^10 ≈ 863.57
@@ -48,23 +59,23 @@ final class FormulaTest extends TestCase
     {
         // buildHours con 3000 risorse, robot=0, naniti=0, speed=1 -> 1.0
         $cost = ['m' => 1000, 'c' => 1000, 'd' => 1000, 'lu' => 0];
-        $hours = Formula::buildHours($cost, 1.0, 0, 1.0, 0.25);
+        $hours = Formula::buildHours($cost, 1.0, 0, 1.0, 0.25, $this->config);
         $this->assertEqualsWithDelta(1.0, $hours, 0.001);
 
         // naniti=1 -> divide per 4 (0.25^1)
-        $hoursNanite1 = Formula::buildHours($cost, 1.0, 1, 1.0, 0.25);
+        $hoursNanite1 = Formula::buildHours($cost, 1.0, 1, 1.0, 0.25, $this->config);
         $this->assertEqualsWithDelta(0.25, $hoursNanite1, 0.001);
 
         // naniti=2 -> divide per 16 (0.25^2)
-        $hoursNanite2 = Formula::buildHours($cost, 1.0, 2, 1.0, 0.25);
+        $hoursNanite2 = Formula::buildHours($cost, 1.0, 2, 1.0, 0.25, $this->config);
         $this->assertEqualsWithDelta(0.0625, $hoursNanite2, 0.001);
 
         // speed=2 -> dimezza il tempo
-        $hoursSpeed2 = Formula::buildHours($cost, 1.0, 0, 2.0, 0.25);
+        $hoursSpeed2 = Formula::buildHours($cost, 1.0, 0, 2.0, 0.25, $this->config);
         $this->assertEqualsWithDelta(0.5, $hoursSpeed2, 0.001);
 
         // speedDivisor=2 (es. Robot 1) -> dimezza il tempo
-        $hoursDiv2 = Formula::buildHours($cost, 2.0, 0, 1.0, 0.25);
+        $hoursDiv2 = Formula::buildHours($cost, 2.0, 0, 1.0, 0.25, $this->config);
         $this->assertEqualsWithDelta(0.5, $hoursDiv2, 0.001);
     }
 

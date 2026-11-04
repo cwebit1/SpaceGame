@@ -14,6 +14,9 @@ final class Format
     /** @var array<string> */
     private static array $scale = [];
 
+    /** @var array<string, int> */
+    private static array $suffixMap = [];
+
     /** @var string */
     private static string $decimalSeparator = ',';
 
@@ -35,6 +38,13 @@ final class Format
         self::$decimalSeparator = $formatConfig['decimal_separator'] ?? ',';
         self::$thousandsSeparator = $formatConfig['thousands_separator'] ?? '.';
         self::$decimals = (int)($formatConfig['decimals'] ?? 2);
+
+        // Costruisce la mappa suffissi-esponenti dalla scala del config
+        self::$suffixMap = [];
+        foreach (self::$scale as $index => $suffix) {
+            $exp = ($index + 1) * 3; // k=10^3, Mln=10^6, Mld=10^9, ecc.
+            self::$suffixMap[strtolower($suffix)] = $exp;
+        }
     }
 
     /**
@@ -131,40 +141,31 @@ final class Format
             return null;
         }
 
-        // Controlla se è negativo
+        // Rifiuta numeri negativi (per validazione input utente)
         if (str_starts_with($s, '-')) {
             return null;
         }
 
-        // Controlla suffissi scala (case-insensitive)
-        $suffixes = [
-            'k' => 3,
-            'mln' => 6,
-            'mld' => 9,
-            'bln' => 12,
-            'bld' => 15,
-            'tln' => 18,
-            'tld' => 21,
-            'qln' => 24,
-            'qld' => 27,
-            'qnl' => 30,
-            'qnd' => 33,
-            'sln' => 36,
-            'sld' => 39,
-        ];
+        // Controlla suffissi scala dalla config (case-insensitive)
+        if (!empty(self::$suffixMap)) {
+            $lower = strtolower($s);
+            // Ordina per lunghezza decrescente per matchare suffissi più lunghi prima (es. Mld prima di Mln)
+            $suffixes = array_keys(self::$suffixMap);
+            usort($suffixes, fn($a, $b) => strlen($b) - strlen($a));
 
-        $lower = strtolower($s);
-        foreach ($suffixes as $suffix => $exp) {
-            if (str_ends_with($lower, $suffix)) {
-                // Estrae la parte numerica usando la lunghezza del suffisso minuscolo
-                $numPart = substr($s, 0, -strlen($suffix));
-                // Normalizza correttamente
-                $normalizedNumPart = self::normalizeNumber($numPart);
-                $num = self::parseNumber($normalizedNumPart);
-                if ($num !== null) {
-                    return $num * pow(10, $exp);
+            foreach ($suffixes as $suffix) {
+                $exp = self::$suffixMap[$suffix];
+                if (str_ends_with($lower, $suffix)) {
+                    // Estrae la parte numerica usando la lunghezza del suffisso minuscolo
+                    $numPart = substr($s, 0, -strlen($suffix));
+                    // Normalizza correttamente
+                    $normalizedNumPart = self::normalizeNumber($numPart);
+                    $num = self::parseNumber($normalizedNumPart);
+                    if ($num !== null) {
+                        return $num * pow(10, $exp);
+                    }
+                    return null;
                 }
-                return null;
             }
         }
 

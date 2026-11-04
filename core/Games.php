@@ -13,42 +13,57 @@ use RuntimeException;
 final class Games
 {
     /**
+     * Restituisce le impostazioni di default per la creazione di una partita.
+     * Legge da settings.defaults nel config.
+     *
+     * @param Config $config
+     * @return array Impostazioni di default
+     */
+    public static function defaultSettings(Config $config): array
+    {
+        $settingsConfig = $config->get('settings');
+        $defaultsConfig = $settingsConfig['defaults'] ?? [];
+
+        return [
+            'speed' => $defaultsConfig['speed'] ?? 1,
+            'cpu_res_mult' => $defaultsConfig['cpu_res_mult'] ?? 1,
+            'cpu_research_mult' => $defaultsConfig['cpu_research_mult'] ?? 1,
+            'galaxies' => $defaultsConfig['galaxies'] ?? ($settingsConfig['galaxy_count_min'] ?? 3),
+            'systems_per_galaxy' => $defaultsConfig['systems_per_galaxy'] ?? ($settingsConfig['system_count_min'] ?? 100),
+            'cpu_density' => $defaultsConfig['cpu_density'] ?? ($settingsConfig['cpu_density_min'] ?? 40),
+            'cpu_live_share' => $defaultsConfig['cpu_live_share'] ?? ($config->get('cpu.live_share_pct') ?? 70),
+            'max_live_empires' => $defaultsConfig['max_live_empires'] ?? ($config->get('cpu.max_live_empires') ?? 150),
+            'cpu_planet_size' => $defaultsConfig['cpu_planet_size'] ?? ($settingsConfig['cpu_planet_size_min'] ?? 50),
+            'cpu_difficulty' => $defaultsConfig['cpu_difficulty'] ?? 'normal',
+            'anti_player_coalitions' => $defaultsConfig['anti_player_coalitions'] ?? false,
+        ];
+    }
+
+    /**
      * Crea una nuova partita per l'utente.
      *
      * @param int $userId ID dell'utente proprietario
      * @param array $settings Impostazioni della partita
      * @param Config|null $config Configurazione di gioco (opzionale, per test usa test_game_config.json)
+     * @param bool $test Usa database di test
      * @return int ID della partita creata
      * @throws RuntimeException se le impostazioni non sono valide
      */
-    public static function create(int $userId, array $settings, ?Config $config = null): int
+    public static function create(int $userId, array $settings, ?Config $config = null, bool $test = false): int
     {
         if ($config === null) {
             $config = Config::fromFile(__DIR__ . '/../game_config.json');
         }
-        $settingsConfig = $config->get('settings');
 
         // Applica default dal config per valori mancanti
-        $defaults = [
-            'speed' => 1,
-            'cpu_res_mult' => 1,
-            'cpu_research_mult' => 1,
-            'galaxies' => $settingsConfig['galaxy_count_min'] ?? 1,
-            'systems_per_galaxy' => $settingsConfig['system_count_min'] ?? 1,
-            'cpu_density' => $settingsConfig['cpu_density_min'] ?? 0,
-            'cpu_live_share' => $config->get('cpu.live_share_pct') ?? 70,
-            'max_live_empires' => $config->get('cpu.max_live_empires') ?? 150,
-            'cpu_planet_size' => $settingsConfig['cpu_planet_size_min'] ?? 10,
-            'cpu_difficulty' => 'normal',
-            'anti_player_coalitions' => false,
-        ];
+        $defaults = self::defaultSettings($config);
 
         $finalSettings = array_merge($defaults, $settings);
 
         // Valida impostazioni (stessa logica di Galaxy::validateSettings)
         self::validateSettings($finalSettings, $config);
 
-        $pdo = Db::pdo();
+        $pdo = Db::pdo($test);
 
         // Crea la partita
         $stmt = $pdo->prepare("
@@ -137,11 +152,12 @@ final class Games
      * Restituisce l'elenco delle partite dell'utente.
      *
      * @param int $userId ID dell'utente
+     * @param bool $test Usa database di test
      * @return array Lista di partite con id, name, speed, created_at
      */
-    public static function list(int $userId): array
+    public static function list(int $userId, bool $test = false): array
     {
-        $pdo = Db::pdo();
+        $pdo = Db::pdo($test);
 
         $stmt = $pdo->prepare("
             SELECT `id`, `name`, `speed`, `created_at`
@@ -159,13 +175,14 @@ final class Games
      * Grazie a ON DELETE CASCADE, elimina anche tutti i dati correlati.
      *
      * @param int $gameId ID della partita
+     * @param bool $test Usa database di test
      * @throws RuntimeException se la partita non esiste o l'utente non è il proprietario
      */
-    public static function delete(int $gameId): void
+    public static function delete(int $gameId, bool $test = false): void
     {
         $userId = Auth::requireUser();
 
-        $pdo = Db::pdo();
+        $pdo = Db::pdo($test);
 
         // Verifica proprietà
         $stmt = $pdo->prepare("SELECT `user_id` FROM `games` WHERE `id` = ?");
@@ -190,13 +207,14 @@ final class Games
      * Utile dopo aggiornamenti del gioco.
      *
      * @param int $gameId ID della partita
+     * @param bool $test Usa database di test
      * @throws RuntimeException se la partita non esiste
      */
-    public static function refreshConfig(int $gameId): void
+    public static function refreshConfig(int $gameId, bool $test = false): void
     {
         $config = Config::fromFile(__DIR__ . '/../game_config.json');
 
-        $pdo = Db::pdo();
+        $pdo = Db::pdo($test);
 
         // Verifica che la partita esista
         $stmt = $pdo->prepare("SELECT `id` FROM `games` WHERE `id` = ?");
@@ -214,11 +232,12 @@ final class Games
      * Recupera i dettagli completi di una partita (per verifica proprietà).
      *
      * @param int $gameId ID della partita
+     * @param bool $test Usa database di test
      * @return array|null Dati della partita o null se non esiste
      */
-    public static function get(int $gameId): ?array
+    public static function get(int $gameId, bool $test = false): ?array
     {
-        $pdo = Db::pdo();
+        $pdo = Db::pdo($test);
 
         $stmt = $pdo->prepare("SELECT * FROM `games` WHERE `id` = ?");
         $stmt->execute([$gameId]);
@@ -231,11 +250,12 @@ final class Games
      *
      * @param int $gameId ID della partita
      * @param int $userId ID dell'utente
+     * @param bool $test Usa database di test
      * @return bool True se l'utente è il proprietario
      */
-    public static function isOwner(int $gameId, int $userId): bool
+    public static function isOwner(int $gameId, int $userId, bool $test = false): bool
     {
-        $pdo = Db::pdo();
+        $pdo = Db::pdo($test);
 
         $stmt = $pdo->prepare("SELECT `user_id` FROM `games` WHERE `id` = ?");
         $stmt->execute([$gameId]);

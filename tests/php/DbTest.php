@@ -164,6 +164,35 @@ class DbTest extends TestCase
     }
 
     /**
+     * Test che PDO restituisca connessioni diverse per test e produzione (E16).
+     */
+    public function test_pdo_returns_different_connections_for_test_and_prod(): void
+    {
+        Db::close();
+
+        // Ottieni connessione di test
+        $pdoTest = Db::pdo(true);
+        $testDbName = $pdoTest->query("SELECT DATABASE()")->fetchColumn();
+
+        // Ottieni connessione di produzione (dovrebbe essere database diverso)
+        $pdoProd = Db::pdo(false);
+        $prodDbName = $pdoProd->query("SELECT DATABASE()")->fetchColumn();
+
+        $this->assertNotEquals($testDbName, $prodDbName, 'Le connessioni test e produzione dovrebbero usare database diversi');
+        $this->assertEquals('spacegame_test', $testDbName, 'Connessione test dovrebbe usare spacegame_test');
+        $this->assertEquals('spacegame', $prodDbName, 'Connessione produzione dovrebbe usare spacegame');
+
+        // Verifica che chiamate successive con stesso flag restituiscano la stessa connessione
+        $pdoTest2 = Db::pdo(true);
+        $this->assertSame($pdoTest, $pdoTest2, 'Chiamate successive con test=true dovrebbero restituire la stessa connessione');
+
+        $pdoProd2 = Db::pdo(false);
+        $this->assertSame($pdoProd, $pdoProd2, 'Chiamate successive con test=false dovrebbero restituire la stessa connessione');
+
+        Db::close();
+    }
+
+    /**
      * Test che la transazione faccia rollback su eccezione.
      */
     public function test_tx_rolls_back_on_exception(): void
@@ -184,7 +213,7 @@ class DbTest extends TestCase
             $stmt = $pdo->prepare("INSERT INTO `users` (`username`, `pass_hash`) VALUES (?, ?)");
             $stmt->execute(['tx_commit_test', 'hash']);
             return (int)$pdo->lastInsertId();
-        });
+        }, true);
 
         $this->assertIsInt($userId);
         $this->assertGreaterThan(0, $userId);
@@ -205,7 +234,7 @@ class DbTest extends TestCase
                 $stmt->execute(['tx_rollback_test', 'hash']);
                 // Forza un'eccezione
                 throw new \RuntimeException('Errore intenzionale per test rollback');
-            });
+            }, true);
         } catch (\RuntimeException $e) {
             $exceptionCaught = true;
             $this->assertEquals('Errore intenzionale per test rollback', $e->getMessage());

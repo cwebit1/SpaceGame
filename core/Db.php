@@ -13,7 +13,9 @@ use PDOException;
 final class Db
 {
     private static ?PDO $pdo = null;
+    private static ?PDO $pdoTest = null;
     private static ?array $config = null;
+    private static ?array $configTest = null;
 
     /**
      * Carica la configurazione dal file config.local.php.
@@ -21,8 +23,14 @@ final class Db
      */
     private static function loadConfig(bool $test = false): array
     {
-        if (self::$config !== null) {
-            return self::$config;
+        if ($test) {
+            if (self::$configTest !== null) {
+                return self::$configTest;
+            }
+        } else {
+            if (self::$config !== null) {
+                return self::$config;
+            }
         }
 
         $configPath = __DIR__ . '/../config.local.php';
@@ -51,14 +59,20 @@ final class Db
         }
 
         // Normalizza chiavi per compatibilità
-        self::$config = [
+        $normalizedConfig = [
             'db_host' => $config['host'],
             'db_port' => $config['port'],
             'db_name' => $config['name'],
             'db_user' => $config['user'],
             'db_pass' => $config['password'],
         ];
-        return self::$config;
+
+        if ($test) {
+            self::$configTest = $normalizedConfig;
+        } else {
+            self::$config = $normalizedConfig;
+        }
+        return $normalizedConfig;
     }
 
     /**
@@ -67,22 +81,41 @@ final class Db
      */
     public static function pdo(bool $test = false): PDO
     {
-        if (self::$pdo !== null) {
+        if ($test) {
+            if (self::$pdoTest !== null) {
+                return self::$pdoTest;
+            }
+
+            $cfg = self::loadConfig(true);
+
+            $dsn = "mysql:host={$cfg['db_host']};port={$cfg['db_port']};dbname={$cfg['db_name']};charset=utf8mb4";
+
+            self::$pdoTest = new PDO($dsn, $cfg['db_user'], $cfg['db_pass'], [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false,
+                PDO::MYSQL_ATTR_INIT_COMMAND => "SET time_zone = '+00:00'",
+            ]);
+
+            return self::$pdoTest;
+        } else {
+            if (self::$pdo !== null) {
+                return self::$pdo;
+            }
+
+            $cfg = self::loadConfig(false);
+
+            $dsn = "mysql:host={$cfg['db_host']};port={$cfg['db_port']};dbname={$cfg['db_name']};charset=utf8mb4";
+
+            self::$pdo = new PDO($dsn, $cfg['db_user'], $cfg['db_pass'], [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false,
+                PDO::MYSQL_ATTR_INIT_COMMAND => "SET time_zone = '+00:00'",
+            ]);
+
             return self::$pdo;
         }
-
-        $cfg = self::loadConfig($test);
-
-        $dsn = "mysql:host={$cfg['db_host']};port={$cfg['db_port']};dbname={$cfg['db_name']};charset=utf8mb4";
-
-        self::$pdo = new PDO($dsn, $cfg['db_user'], $cfg['db_pass'], [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => false,
-            PDO::MYSQL_ATTR_INIT_COMMAND => "SET time_zone = '+00:00'",
-        ]);
-
-        return self::$pdo;
     }
 
     /**
@@ -91,7 +124,9 @@ final class Db
     public static function close(): void
     {
         self::$pdo = null;
+        self::$pdoTest = null;
         self::$config = null;
+        self::$configTest = null;
     }
 
     /**
@@ -101,11 +136,12 @@ final class Db
      *
      * @template T
      * @param callable(): T $callback
+     * @param bool $test Usa database di test
      * @return T
      */
-    public static function tx(callable $callback)
+    public static function tx(callable $callback, bool $test = false)
     {
-        $pdo = self::pdo();
+        $pdo = self::pdo($test);
         $pdo->beginTransaction();
         try {
             $result = $callback();
@@ -127,14 +163,15 @@ final class Db
      * @template T
      * @param int $gameId
      * @param callable(): T $callback
-     * @param int $timeoutSecondi Timeout in secondi per acquisire il lock (default 10)
+     * @param int $timeoutSecondi Timeout in secondi per acquisire il lock (default 5)
+     * @param bool $test Usa database di test
      * @return T
      * @throws LockBusyException se il lock è già detenuto da un altro processo
      */
-    public static function withGameLock(int $gameId, callable $callback, int $timeoutSecondi = 10)
+    public static function withGameLock(int $gameId, callable $callback, int $timeoutSecondi = 5, bool $test = false)
     {
         $lockName = "spacegame_game_{$gameId}";
-        $pdo = self::pdo();
+        $pdo = self::pdo($test);
 
         // Tenta di acquisire il lock
         $stmt = $pdo->prepare("SELECT GET_LOCK(?, ?) AS acquired");
@@ -156,10 +193,10 @@ final class Db
     /**
      * Verifica se esiste un lock su game_id (senza acquisirlo).
      */
-    public static function isGameLocked(int $gameId): bool
+    public static function isGameLocked(int $gameId, bool $test = false): bool
     {
         $lockName = "spacegame_game_{$gameId}";
-        $pdo = self::pdo();
+        $pdo = self::pdo($test);
         $stmt = $pdo->prepare("SELECT IS_FREE_LOCK(?) AS free");
         $stmt->execute([$lockName]);
         $row = $stmt->fetch();

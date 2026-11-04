@@ -211,16 +211,16 @@ class QueueTest extends TestCase
         // Per 0.25^L usiamo direttamente pow(0.25, L) o buildHours con naniteFactor
 
         // Verifica buildHours con naniti 2: factor = 0.25^2 = 0.0625
-        $hours = Formula::buildHours(['m' => 3000, 'c' => 0, 'd' => 0], 1.0, 2, 1.0, 0.25);
+        $hours = Formula::buildHours(['m' => 3000, 'c' => 0, 'd' => 0], 1.0, 2, 1.0, 0.25, $this->config);
         // (3000/3000) / 1 * 0.25^2 / 1 = 1 * 0.0625 = 0.0625
         $this->assertEqualsWithDelta(0.0625, $hours, 0.0001);
 
         // Naniti livello 1: 0.25^1 = 0.25
-        $hoursL1 = Formula::buildHours(['m' => 3000, 'c' => 0, 'd' => 0], 1.0, 1, 1.0, 0.25);
+        $hoursL1 = Formula::buildHours(['m' => 3000, 'c' => 0, 'd' => 0], 1.0, 1, 1.0, 0.25, $this->config);
         $this->assertEqualsWithDelta(0.25, $hoursL1, 0.0001);
 
         // Naniti livello 0: 0.25^0 = 1.0 (nessun effetto)
-        $hoursL0 = Formula::buildHours(['m' => 3000, 'c' => 0, 'd' => 0], 1.0, 0, 1.0, 0.25);
+        $hoursL0 = Formula::buildHours(['m' => 3000, 'c' => 0, 'd' => 0], 1.0, 0, 1.0, 0.25, $this->config);
         $this->assertEqualsWithDelta(1.0, $hoursL0, 0.0001);
     }
 

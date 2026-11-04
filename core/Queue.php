@@ -322,7 +322,7 @@ final class Queue
         }
 
         // Per quantità > 1 (navi), il tempo è per unità * qty
-        $hoursPerUnit = Formula::buildHours($cost, $speedDivisor, $naniteLevel, $gameSpeed, $naniteFactor);
+        $hoursPerUnit = Formula::buildHours($cost, $speedDivisor, $naniteLevel, $gameSpeed, $naniteFactor, $config);
         return $hoursPerUnit * $qty;
     }
 

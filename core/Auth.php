@@ -21,11 +21,12 @@ final class Auth
      *
      * @param string $username Username
      * @param string $password Password in chiaro
+     * @param bool $test Usa database di test
      * @return bool True se login riuscito
      */
-    public static function login(string $username, string $password): bool
+    public static function login(string $username, string $password, bool $test = false): bool
     {
-        $pdo = Db::pdo();
+        $pdo = Db::pdo($test);
 
         $stmt = $pdo->prepare("SELECT `id`, `pass_hash` FROM `users` WHERE `username` = ?");
         $stmt->execute([$username]);

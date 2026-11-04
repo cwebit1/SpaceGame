@@ -77,7 +77,7 @@ class GamesTest extends TestCase
     {
         $userId = $this->createTestUser('test_login', 'password123');
 
-        $result = Auth::login('test_login', 'password123');
+        $result = Auth::login('test_login', 'password123', true);
         $this->assertTrue($result);
         $this->assertEquals($userId, Auth::requireUser());
     }
@@ -86,13 +86,13 @@ class GamesTest extends TestCase
     {
         $this->createTestUser('test_wrong_pass', 'password123');
 
-        $result = Auth::login('test_wrong_pass', 'wrongpassword');
+        $result = Auth::login('test_wrong_pass', 'wrongpassword', true);
         $this->assertFalse($result);
     }
 
     public function test_login_nonexistent_user(): void
     {
-        $result = Auth::login('nonexistent', 'password');
+        $result = Auth::login('nonexistent', 'password', true);
         $this->assertFalse($result);
     }
 
@@ -107,7 +107,7 @@ class GamesTest extends TestCase
     public function test_csrf_token_generated_and_checked(): void
     {
         $userId = $this->createTestUser('test_csrf', 'password123');
-        Auth::login('test_csrf', 'password123');
+        Auth::login('test_csrf', 'password123', true);
 
         $token = Auth::csrfToken();
         $this->assertIsString($token);
@@ -120,7 +120,7 @@ class GamesTest extends TestCase
     public function test_csrf_check_fails_on_wrong_token(): void
     {
         $this->createTestUser('test_csrf2', 'password123');
-        Auth::login('test_csrf2', 'password123');
+        Auth::login('test_csrf2', 'password123', true);
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('CSRF');
@@ -131,7 +131,7 @@ class GamesTest extends TestCase
     public function test_csrf_check_fails_on_missing_token(): void
     {
         $this->createTestUser('test_csrf3', 'password123');
-        Auth::login('test_csrf3', 'password123');
+        Auth::login('test_csrf3', 'password123', true);
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('CSRF');
@@ -142,7 +142,7 @@ class GamesTest extends TestCase
     public function test_logout_clears_session(): void
     {
         $this->createTestUser('test_logout', 'password123');
-        Auth::login('test_logout', 'password123');
+        Auth::login('test_logout', 'password123', true);
         $this->assertEquals(1, Auth::requireUser()); // logged in
 
         Auth::logout();
@@ -156,7 +156,7 @@ class GamesTest extends TestCase
     public function test_create_game_valid_settings(): void
     {
         $userId = $this->createTestUser('test_create', 'password123');
-        Auth::login('test_create', 'password123');
+        Auth::login('test_create', 'password123', true);
 
         $settings = [
             'speed' => 1,
@@ -172,7 +172,7 @@ class GamesTest extends TestCase
             'anti_player_coalitions' => false,
         ];
 
-        $gameId = Games::create($userId, $settings, $this->config);
+        $gameId = Games::create($userId, $settings, $this->config, true);
 
         $this->assertIsInt($gameId);
         $this->assertGreaterThan(0, $gameId);
@@ -199,7 +199,7 @@ class GamesTest extends TestCase
     public function test_create_game_rejects_speed_out_of_range(): void
     {
         $userId = $this->createTestUser('test_create_speed', 'password123');
-        Auth::login('test_create_speed', 'password123');
+        Auth::login('test_create_speed', 'password123', true);
 
         $settings = [
             'speed' => 101, // > max 100
@@ -216,13 +216,13 @@ class GamesTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('speed');
 
-        Games::create($userId, $settings, $this->config);
+        Games::create($userId, $settings, $this->config, true);
     }
 
     public function test_create_game_rejects_cpu_res_mult_greater_than_speed(): void
     {
         $userId = $this->createTestUser('test_create_cpu_res', 'password123');
-        Auth::login('test_create_cpu_res', 'password123');
+        Auth::login('test_create_cpu_res', 'password123', true);
 
         $settings = [
             'speed' => 10,
@@ -239,13 +239,13 @@ class GamesTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('cpu_res_mult');
 
-        Games::create($userId, $settings, $this->config);
+        Games::create($userId, $settings, $this->config, true);
     }
 
     public function test_create_game_rejects_cpu_research_mult_greater_than_speed(): void
     {
         $userId = $this->createTestUser('test_create_cpu_research', 'password123');
-        Auth::login('test_create_cpu_research', 'password123');
+        Auth::login('test_create_cpu_research', 'password123', true);
 
         $settings = [
             'speed' => 10,
@@ -262,13 +262,13 @@ class GamesTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('cpu_research_mult');
 
-        Games::create($userId, $settings, $this->config);
+        Games::create($userId, $settings, $this->config, true);
     }
 
     public function test_create_game_rejects_galaxies_out_of_range(): void
     {
         $userId = $this->createTestUser('test_create_galaxies', 'password123');
-        Auth::login('test_create_galaxies', 'password123');
+        Auth::login('test_create_galaxies', 'password123', true);
 
         $settings = [
             'speed' => 1,
@@ -285,13 +285,13 @@ class GamesTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('galaxies');
 
-        Games::create($userId, $settings, $this->config);
+        Games::create($userId, $settings, $this->config, true);
     }
 
     public function test_create_game_rejects_systems_per_galaxy_out_of_range(): void
     {
         $userId = $this->createTestUser('test_create_systems', 'password123');
-        Auth::login('test_create_systems', 'password123');
+        Auth::login('test_create_systems', 'password123', true);
 
         $settings = [
             'speed' => 1,
@@ -308,13 +308,13 @@ class GamesTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('systems_per_galaxy');
 
-        Games::create($userId, $settings, $this->config);
+        Games::create($userId, $settings, $this->config, true);
     }
 
     public function test_create_game_rejects_cpu_density_out_of_range(): void
     {
         $userId = $this->createTestUser('test_create_density', 'password123');
-        Auth::login('test_create_density', 'password123');
+        Auth::login('test_create_density', 'password123', true);
 
         $settings = [
             'speed' => 1,
@@ -331,13 +331,13 @@ class GamesTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('cpu_density');
 
-        Games::create($userId, $settings, $this->config);
+        Games::create($userId, $settings, $this->config, true);
     }
 
     public function test_create_game_rejects_cpu_planet_size_out_of_range(): void
     {
         $userId = $this->createTestUser('test_create_planet_size', 'password123');
-        Auth::login('test_create_planet_size', 'password123');
+        Auth::login('test_create_planet_size', 'password123', true);
 
         $settings = [
             'speed' => 1,
@@ -354,13 +354,13 @@ class GamesTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('cpu_planet_size');
 
-        Games::create($userId, $settings, $this->config);
+        Games::create($userId, $settings, $this->config, true);
     }
 
     public function test_create_game_uses_defaults_for_missing_settings(): void
     {
         $userId = $this->createTestUser('test_create_defaults', 'password123');
-        Auth::login('test_create_defaults', 'password123');
+        Auth::login('test_create_defaults', 'password123', true);
 
         // Solo impostazioni obbligatorie minimali
         $settings = [
@@ -369,7 +369,7 @@ class GamesTest extends TestCase
             'cpu_research_mult' => 1,
         ];
 
-        $gameId = Games::create($userId, $settings, $this->config);
+        $gameId = Games::create($userId, $settings, $this->config, true);
 
         $pdo = Db::pdo(true);
         $stmt = $pdo->prepare("SELECT `settings_json`, `config_json` FROM `games` WHERE `id` = ?");
@@ -390,7 +390,7 @@ class GamesTest extends TestCase
     public function test_list_games_returns_user_games(): void
     {
         $userId = $this->createTestUser('test_list', 'password123');
-        Auth::login('test_list', 'password123');
+        Auth::login('test_list', 'password123', true);
 
         // Crea 3 partite
         $settings = [
@@ -405,11 +405,11 @@ class GamesTest extends TestCase
             'cpu_planet_size' => 50,
         ];
 
-        $gameId1 = Games::create($userId, $settings, $this->config);
-        $gameId2 = Games::create($userId, $settings, $this->config);
-        $gameId3 = Games::create($userId, $settings, $this->config);
+        $gameId1 = Games::create($userId, $settings, $this->config, true);
+        $gameId2 = Games::create($userId, $settings, $this->config, true);
+        $gameId3 = Games::create($userId, $settings, $this->config, true);
 
-        $games = Games::list($userId);
+        $games = Games::list($userId, true);
 
         $this->assertCount(3, $games);
         $ids = array_column($games, 'id');
@@ -431,19 +431,19 @@ class GamesTest extends TestCase
         $userId1 = $this->createTestUser('test_list_user1', 'password123');
         $userId2 = $this->createTestUser('test_list_user2', 'password123');
 
-        Auth::login('test_list_user1', 'password123');
+        Auth::login('test_list_user1', 'password123', true);
         $settings = [
             'speed' => 1, 'cpu_res_mult' => 1, 'cpu_research_mult' => 1,
             'galaxies' => 1, 'systems_per_galaxy' => 5, 'cpu_density' => 30,
             'cpu_live_share' => 70, 'max_live_empires' => 150, 'cpu_planet_size' => 50,
         ];
-        $gameId1 = Games::create($userId1, $settings, $this->config);
+        $gameId1 = Games::create($userId1, $settings, $this->config, true);
 
         Auth::logout();
-        Auth::login('test_list_user2', 'password123');
-        $gameId2 = Games::create($userId2, $settings, $this->config);
+        Auth::login('test_list_user2', 'password123', true);
+        $gameId2 = Games::create($userId2, $settings, $this->config, true);
 
-        $games = Games::list($userId2);
+        $games = Games::list($userId2, true);
 
         $this->assertCount(1, $games);
         $this->assertEquals($gameId2, $games[0]['id']);
@@ -452,14 +452,14 @@ class GamesTest extends TestCase
     public function test_delete_game_removes_game_and_related_data(): void
     {
         $userId = $this->createTestUser('test_delete', 'password123');
-        Auth::login('test_delete', 'password123');
+        Auth::login('test_delete', 'password123', true);
 
         $settings = [
             'speed' => 1, 'cpu_res_mult' => 1, 'cpu_research_mult' => 1,
             'galaxies' => 1, 'systems_per_galaxy' => 5, 'cpu_density' => 30,
             'cpu_live_share' => 70, 'max_live_empires' => 150, 'cpu_planet_size' => 50,
         ];
-        $gameId = Games::create($userId, $settings, $this->config);
+        $gameId = Games::create($userId, $settings, $this->config, true);
 
         // Genera galassia per avere dati correlati
         \SpaceGame\Galaxy::generate($gameId, $this->config, true);
@@ -475,7 +475,7 @@ class GamesTest extends TestCase
         $this->assertGreaterThan(0, (int)$stmt->fetchColumn());
 
         // Elimina
-        Games::delete($gameId);
+        Games::delete($gameId, true);
 
         // Verifica che la partita sia sparita
         $stmt = $pdo->prepare("SELECT COUNT(*) FROM `games` WHERE `id` = ?");
@@ -497,34 +497,34 @@ class GamesTest extends TestCase
         $userId1 = $this->createTestUser('test_delete_owner', 'password123');
         $userId2 = $this->createTestUser('test_delete_thief', 'password123');
 
-        Auth::login('test_delete_owner', 'password123');
+        Auth::login('test_delete_owner', 'password123', true);
         $settings = [
             'speed' => 1, 'cpu_res_mult' => 1, 'cpu_research_mult' => 1,
             'galaxies' => 1, 'systems_per_galaxy' => 5, 'cpu_density' => 30,
             'cpu_live_share' => 70, 'max_live_empires' => 150, 'cpu_planet_size' => 50,
         ];
-        $gameId = Games::create($userId1, $settings, $this->config);
+        $gameId = Games::create($userId1, $settings, $this->config, true);
 
         Auth::logout();
-        Auth::login('test_delete_thief', 'password123');
+        Auth::login('test_delete_thief', 'password123', true);
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Non autorizzato a eliminare questa partita');
 
-        Games::delete($gameId);
+        Games::delete($gameId, true);
     }
 
     public function test_refresh_config_updates_config_json(): void
     {
         $userId = $this->createTestUser('test_refresh', 'password123');
-        Auth::login('test_refresh', 'password123');
+        Auth::login('test_refresh', 'password123', true);
 
         $settings = [
             'speed' => 1, 'cpu_res_mult' => 1, 'cpu_research_mult' => 1,
             'galaxies' => 1, 'systems_per_galaxy' => 5, 'cpu_density' => 30,
             'cpu_live_share' => 70, 'max_live_empires' => 150, 'cpu_planet_size' => 50,
         ];
-        $gameId = Games::create($userId, $settings, $this->config);
+        $gameId = Games::create($userId, $settings, $this->config, true);
 
         // Modifica il config.json nel DB (simula versione vecchia)
         $pdo = Db::pdo(true);
@@ -533,7 +533,7 @@ class GamesTest extends TestCase
         $stmt->execute([$oldConfig, $gameId]);
 
         // Refresh
-        Games::refreshConfig($gameId);
+        Games::refreshConfig($gameId, true);
 
         // Verifica che sia stato aggiornato al config corrente
         $stmt = $pdo->prepare("SELECT `config_json` FROM `games` WHERE `id` = ?");

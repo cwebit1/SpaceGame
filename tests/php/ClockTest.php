@@ -157,12 +157,12 @@ class ClockTest extends TestCase
         });
 
         // Programma eventi in ordine sparso
-        EventBus::schedule($gameId, 100.0, 'test_event', 0, ['step' => 3]);
-        EventBus::schedule($gameId, 50.0, 'test_event', 0, ['step' => 1]);
-        EventBus::schedule($gameId, 75.0, 'test_event', 0, ['step' => 2]);
+        EventBus::schedule($gameId, 100.0, 'test_event', 0, ['step' => 3], true);
+        EventBus::schedule($gameId, 50.0, 'test_event', 0, ['step' => 1], true);
+        EventBus::schedule($gameId, 75.0, 'test_event', 0, ['step' => 2], true);
 
         // Esegui catchUp fino a tempo 200
-        Clock::catchUp($gameId, 200.0, 10.0);
+        Clock::catchUp($gameId, 200.0, 10.0, true);
 
         // Verifica ordine di esecuzione
         $this->assertEquals([1, 2, 3], $executionOrder, 'Eventi eseguiti fuori ordine temporale');
@@ -189,17 +189,17 @@ class ClockTest extends TestCase
         // Programma 10 eventi sparsi nel tempo per entrambe le partite
         for ($i = 0; $i < 10; $i++) {
             $at = 100.0 + $i * 100.0;
-            EventBus::schedule($gameId1, $at, 'economy_test', 1, ['amount' => 50]);
-            EventBus::schedule($gameId2, $at, 'economy_test', 1, ['amount' => 50]);
+            EventBus::schedule($gameId1, $at, 'economy_test', 1, ['amount' => 50], true);
+            EventBus::schedule($gameId2, $at, 'economy_test', 1, ['amount' => 50], true);
         }
 
         // Partita 1: catchUp singolo
-        Clock::catchUp($gameId1, 2000.0, 10.0);
+        Clock::catchUp($gameId1, 2000.0, 10.0, true);
 
         // Partita 2: catchUp a 50 blocchi con budget minimo
         for ($i = 0; $i < 50; $i++) {
             $now = 40.0 * ($i + 1);
-            Clock::catchUp($gameId2, $now, 0.001); // budget minimo per forzare chunking
+            Clock::catchUp($gameId2, $now, 0.001, true); // budget minimo per forzare chunking
         }
 
         // Confronta stato finale
@@ -231,16 +231,16 @@ class ClockTest extends TestCase
         });
 
         // Programma un singolo evento
-        EventBus::schedule($gameId, 100.0, 'concurrent_test', 0, []);
+        EventBus::schedule($gameId, 100.0, 'concurrent_test', 0, [], true);
 
         // Simula due catchUp concorrenti (in realtà sequenziali ma con lock)
         $pdo = Db::pdo(true);
 
         // Primo catchUp - elabora l'evento
-        Clock::catchUp($gameId, 200.0, 10.0);
+        Clock::catchUp($gameId, 200.0, 10.0, true);
 
         // Secondo catchUp - l'evento dovrebbe essere già done=1
-        Clock::catchUp($gameId, 300.0, 10.0);
+        Clock::catchUp($gameId, 300.0, 10.0, true);
 
         // Handler deve essere stato chiamato una sola volta
         $this->assertEquals(1, $executionCount, "Handler chiamato $executionCount volte (atteso 1)");
@@ -260,11 +260,11 @@ class ClockTest extends TestCase
 
         // Programma molti eventi
         for ($i = 0; $i < 20; $i++) {
-            EventBus::schedule($gameId, 100.0 + $i * 10.0, 'slow_event', 0, []);
+            EventBus::schedule($gameId, 100.0 + $i * 10.0, 'slow_event', 0, [], true);
         }
 
         // catchUp con budget molto basso (1ms) dovrebbe tornare false
-        $result = Clock::catchUp($gameId, 500.0, 0.001);
+        $result = Clock::catchUp($gameId, 500.0, 0.001, true);
 
         $this->assertFalse($result, 'catchUp dovrebbe tornare false quando budget esaurito');
 

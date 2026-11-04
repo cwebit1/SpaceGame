@@ -13,19 +13,33 @@
     "cpu_density_min": 0,
     "cpu_density_max": 100,
     "cpu_planet_size_min": 10,
-    "cpu_planet_size_max": 100
+    "cpu_planet_size_max": 100,
+    "defaults": {
+      "speed": 1,
+      "cpu_res_mult": 1,
+      "cpu_research_mult": 1,
+      "galaxies": 3,
+      "systems_per_galaxy": 100,
+      "cpu_density": 40,
+      "cpu_live_share": 70,
+      "max_live_empires": 150,
+      "cpu_planet_size": 50,
+      "cpu_difficulty": "normal",
+      "anti_player_coalitions": false
+    }
   },
   "galaxy": {
+    "base_fields_planet": 2000,
     "positions_per_system": 20,
     "planet_positions": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
     "warp_position": 16,
     "asteroid_positions": [17, 18, 19, 20],
     "planet_types": {
-      "rocky": { "name": "Roccioso", "metal_bonus": 1.2 },
-      "crystalline": { "name": "Cristallino", "crystal_bonus": 1.2 },
-      "oceanic": { "name": "Oceanico", "deuterium_bonus": 1.2 },
-      "desert": { "name": "Desertico", "solar_bonus": 1.2 },
-      "standard": { "name": "Standard" }
+      "rocky": { "name": "Roccioso", "metal_bonus": 1.2, "weight": 20 },
+      "crystalline": { "name": "Cristallino", "crystal_bonus": 1.2, "weight": 20 },
+      "oceanic": { "name": "Oceanico", "deuterium_bonus": 1.2, "weight": 20 },
+      "desert": { "name": "Desertico", "solar_bonus": 1.2, "weight": 20 },
+      "standard": { "name": "Standard", "weight": 20 }
     },
     "position_temp_modifiers": {
       "1-3": { "solar": 1.3, "deuterium": 0.7, "geothermal": 1.5 },
@@ -41,6 +55,9 @@
       "desert": { "solar": 1.2 },
       "standard": {}
     }
+  },
+  "formula": {
+    "construction_cost_divisor": 3000
   },
   "resources": {
     "base_production": {
@@ -1259,7 +1276,7 @@
   },
   "cpu": {
     "max_live_empires": 150,
-    "live_share_pct": 0.7,
+    "live_share_pct": 70,
     "resource_multiplier_max": 1.0,
     "research_multiplier_max": 1.0,
     "difficulty_levels": ["easy", "normal", "hard", "expert"],
@@ -1362,6 +1379,11 @@
     "decimal_separator": ",",
     "thousands_separator": ".",
     "decimals": 2
+  },
+  "security": {
+    "login_max_attempts": 5,
+    "login_lockout_minutes": 15,
+    "cors_allowed_origin": "*"
   },
   "realtime": {
     "moon_destroyed_cooldown_hours": 48,

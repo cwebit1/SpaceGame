@@ -28,10 +28,10 @@ final class Galaxy
         $pdo = Db::pdo($test);
         $settings = self::getGameSettings($pdo, $gameId);
 
-        // Imposta seed per generazione deterministica
-        if ($seed !== null) {
-            mt_srand($seed);
-        }
+        // Crea motore random locale per generazione deterministica senza influire sullo stato globale
+        $rng = new \Random\Randomizer(
+            $seed !== null ? new \Random\Engine\Mt19937($seed) : new \Random\Engine\Mt19937()
+        );
 
         // 1. Valida impostazioni
         self::validateSettings($settings, $config);
@@ -57,7 +57,7 @@ final class Galaxy
             $cpuLiveShare,
             $maxLiveEmpires,
             $cpuPlanetSizePct,
-            $seed
+            $rng
         );
 
         // 4. Popola corpi celesti (pianeti, warp, asteroidi)
@@ -71,7 +71,7 @@ final class Galaxy
             $cpuDensity,
             $cpuPlanetSizePct,
             $config,
-            $seed
+            $rng
         );
 
         // 5. Copia configurazione nella partita (config_json)
@@ -96,19 +96,21 @@ final class Galaxy
 
     /**
      * Valida le impostazioni della partita secondo i range in config.
+     * Usa i default da settings.defaults per coerenza con Games::create().
      */
     private static function validateSettings(array $settings, Config $config): void
     {
         $settingsConfig = $config->get('settings');
+        $defaultsConfig = $settingsConfig['defaults'] ?? [];
 
         // Velocità player
-        $speed = (float)($settings['speed'] ?? 1);
+        $speed = (float)($settings['speed'] ?? ($defaultsConfig['speed'] ?? 1));
         if ($speed < $settingsConfig['player_speed_min'] || $speed > $settingsConfig['player_speed_max']) {
             throw new RuntimeException("speed deve essere tra {$settingsConfig['player_speed_min']} e {$settingsConfig['player_speed_max']}");
         }
 
         // CPU resource multiplier
-        $cpuResMult = (float)($settings['cpu_res_mult'] ?? 1);
+        $cpuResMult = (float)($settings['cpu_res_mult'] ?? ($defaultsConfig['cpu_res_mult'] ?? 1));
         if ($cpuResMult < $settingsConfig['cpu_resource_mult_min'] || $cpuResMult > $settingsConfig['cpu_resource_mult_max']) {
             throw new RuntimeException("cpu_res_mult deve essere tra {$settingsConfig['cpu_resource_mult_min']} e {$settingsConfig['cpu_resource_mult_max']}");
         }
@@ -117,7 +119,7 @@ final class Galaxy
         }
 
         // CPU research multiplier
-        $cpuResearchMult = (float)($settings['cpu_research_mult'] ?? 1);
+        $cpuResearchMult = (float)($settings['cpu_research_mult'] ?? ($defaultsConfig['cpu_research_mult'] ?? 1));
         if ($cpuResearchMult < $settingsConfig['cpu_research_mult_min'] || $cpuResearchMult > $settingsConfig['cpu_research_mult_max']) {
             throw new RuntimeException("cpu_research_mult deve essere tra {$settingsConfig['cpu_research_mult_min']} e {$settingsConfig['cpu_research_mult_max']}");
         }
@@ -126,25 +128,25 @@ final class Galaxy
         }
 
         // Galassie
-        $galaxies = (int)($settings['galaxies'] ?? 3);
+        $galaxies = (int)($settings['galaxies'] ?? ($defaultsConfig['galaxies'] ?? ($settingsConfig['galaxy_count_min'] ?? 3)));
         if ($galaxies < $settingsConfig['galaxy_count_min'] || $galaxies > $settingsConfig['galaxy_count_max']) {
             throw new RuntimeException("galaxies deve essere tra {$settingsConfig['galaxy_count_min']} e {$settingsConfig['galaxy_count_max']}");
         }
 
         // Sistemi per galassia
-        $systemsPerGalaxy = (int)($settings['systems_per_galaxy'] ?? 100);
+        $systemsPerGalaxy = (int)($settings['systems_per_galaxy'] ?? ($defaultsConfig['systems_per_galaxy'] ?? ($settingsConfig['system_count_min'] ?? 100)));
         if ($systemsPerGalaxy < $settingsConfig['system_count_min'] || $systemsPerGalaxy > $settingsConfig['system_count_max']) {
             throw new RuntimeException("systems_per_galaxy deve essere tra {$settingsConfig['system_count_min']} e {$settingsConfig['system_count_max']}");
         }
 
         // Densità CPU
-        $cpuDensity = (float)($settings['cpu_density'] ?? 40);
+        $cpuDensity = (float)($settings['cpu_density'] ?? ($defaultsConfig['cpu_density'] ?? ($settingsConfig['cpu_density_min'] ?? 40)));
         if ($cpuDensity < $settingsConfig['cpu_density_min'] || $cpuDensity > $settingsConfig['cpu_density_max']) {
             throw new RuntimeException("cpu_density deve essere tra {$settingsConfig['cpu_density_min']} e {$settingsConfig['cpu_density_max']}");
         }
 
         // CPU planet size
-        $cpuPlanetSize = (float)($settings['cpu_planet_size'] ?? 50);
+        $cpuPlanetSize = (float)($settings['cpu_planet_size'] ?? ($defaultsConfig['cpu_planet_size'] ?? ($settingsConfig['cpu_planet_size_min'] ?? 50)));
         if ($cpuPlanetSize < $settingsConfig['cpu_planet_size_min'] || $cpuPlanetSize > $settingsConfig['cpu_planet_size_max']) {
             throw new RuntimeException("cpu_planet_size deve essere tra {$settingsConfig['cpu_planet_size_min']} e {$settingsConfig['cpu_planet_size_max']}");
         }
@@ -183,7 +185,7 @@ final class Galaxy
         float $cpuLiveShare,
         int $maxLiveEmpires,
         float $cpuPlanetSizePct,
-        ?int $seed
+        \Random\Randomizer $rng
     ): array {
         // Calcola posizioni pianeta totali disponibili (posizioni 1-15 per sistema)
         $totalPlanetPositions = $galaxyCount * $systemsPerGalaxy * 15;
@@ -206,6 +208,12 @@ final class Galaxy
         $targetLiveEmpires = min($targetLiveEmpires, $maxLiveEmpires);
         $targetLiveEmpires = max($targetLiveEmpires, 1);
 
+        // Ensure live empires don't consume more planets than available
+        $maxLiveEmpiresByPlanets = (int)floor($targetCpuPlanets / $avgPlanetsPerLive);
+        if ($targetLiveEmpires > $maxLiveEmpiresByPlanets) {
+            $targetLiveEmpires = max($maxLiveEmpiresByPlanets, 1);
+        }
+
         // Calcola imperi semplificati per coprire i pianeti rimanenti
         $remainingPlanets = $targetCpuPlanets - ($targetLiveEmpires * $avgPlanetsPerLive);
         $targetSimpleEmpires = max(0, (int)ceil($remainingPlanets / $avgPlanetsPerSimple));
@@ -221,7 +229,7 @@ final class Galaxy
 
         // Crea imperi CPU vivi
         for ($i = 0; $i < $targetLiveEmpires; $i++) {
-            $personality = $personalities[array_rand($personalities)];
+            $personality = $personalities[$rng->getInt(0, count($personalities) - 1)];
             $stmt = $pdo->prepare("
                 INSERT INTO `empires` (`game_id`, `kind`, `name`, `personality`, `settings_json`)
                 VALUES (?, 'cpu', ?, ?, '{}')
@@ -241,7 +249,7 @@ final class Galaxy
         // Crea imperi CPU semplificati
         $simpleTiers = ['inactive', 'weak', 'medium'];
         for ($i = 0; $i < $targetSimpleEmpires; $i++) {
-            $tier = $simpleTiers[array_rand($simpleTiers)];
+            $tier = $simpleTiers[$rng->getInt(0, count($simpleTiers) - 1)];
             $stmt = $pdo->prepare("
                 INSERT INTO `empires` (`game_id`, `kind`, `name`, `personality`, `settings_json`)
                 VALUES (?, 'simple', ?, ?, '{}')
@@ -274,7 +282,7 @@ final class Galaxy
         float $cpuDensity,
         float $cpuPlanetSizePct,
         Config $config,
-        ?int $seed
+        \Random\Randomizer $rng
     ): void {
         $galaxyConfig = $config->get('galaxy');
         $moonConfig = $config->get('moon');
@@ -286,11 +294,11 @@ final class Galaxy
         $tempModifiers = $galaxyConfig['position_temp_modifiers'];
         $typeModifiers = $galaxyConfig['planet_type_modifiers'];
 
-        // Campi base pianeta player = 2000 (spec §3)
-        $playerBaseFields = 2000;
+        // Campi base pianeta player (da config, default 2000 per spec §3)
+        $playerBaseFields = (int)($galaxyConfig['base_fields_planet'] ?? 2000);
 
-        // Campi base pianeti CPU = 2000 * (cpuPlanetSizePct / 100)
-        $cpuBaseFields = (int)round(2000 * $cpuPlanetSizePct / 100);
+        // Campi base pianeti CPU = base_fields_planet * (cpuPlanetSizePct / 100)
+        $cpuBaseFields = (int)round($playerBaseFields * $cpuPlanetSizePct / 100);
 
         // Prepara lista di tutte le posizioni pianeta (1-15) per tutti i sistemi
         $allPlanetSlots = [];
@@ -302,12 +310,15 @@ final class Galaxy
             }
         }
 
-        // Mescola per distribuzione casuale
-        shuffle($allPlanetSlots);
+        // Mescola per distribuzione casuale usando RNG locale
+        $allPlanetSlots = $rng->shuffleArray($allPlanetSlots);
 
         // Calcola quanti slot occupare per CPU
         $totalSlots = count($allPlanetSlots);
         $cpuSlotsToFill = (int)round($totalSlots * $cpuDensity / 100);
+
+        // Traccia slot occupati per evitare N+1 query
+        $occupiedSlots = [];
 
         // Assegna pianeti CPU
         // Costruisci una lista piatta di slot impero disponibili (ogni impero appare max_planets volte)
@@ -323,8 +334,8 @@ final class Galaxy
             }
         }
 
-        // Mescola per distribuzione casuale
-        shuffle($empireSlots);
+        // Mescola per distribuzione casuale usando RNG locale
+        $empireSlots = $rng->shuffleArray($empireSlots);
 
         // Prendi solo gli slot necessari
         $empireSlots = array_slice($empireSlots, 0, $cpuSlotsToFill);
@@ -334,27 +345,31 @@ final class Galaxy
             if ($slotIndex >= $totalSlots) break;
 
             $slot = $allPlanetSlots[$slotIndex++];
-            $planetType = self::randomPlanetType($planetTypes);
+            $planetType = self::randomPlanetType($planetTypes, $galaxyConfig, $rng);
             $tempClass = self::getTempClass($slot['p'], $tempModifiers);
 
             self::insertBody($pdo, $gameId, $empireId, $slot['g'], $slot['s'], $slot['p'],
                 false, $planetType, $tempClass, $cpuBaseFields, $typeModifiers, $planetTypes);
+
+            // Traccia slot occupati per evitare N+1 query nel posizionamento homeworld
+            $occupiedSlots[$slot['g']][$slot['s']][$slot['p']] = true;
         }
 
         // Pianeta madre del player: scegli uno slot libero (preferibilmente posizione 8, temperatura neutra)
+        // Priorità: posizione 8 (temp 3 neutra), poi posizioni 7-9, poi qualsiasi libera
         $playerSlot = null;
-        foreach ($allPlanetSlots as $slot) {
-            // Controlla se è già occupato
-            $stmt = $pdo->prepare("SELECT 1 FROM `bodies` WHERE `game_id` = ? AND `g` = ? AND `s` = ? AND `p` = ? AND `is_moon` = 0");
-            $stmt->execute([$gameId, $slot['g'], $slot['s'], $slot['p']]);
-            if (!$stmt->fetch()) {
-                $playerSlot = $slot;
-                break;
+        $preferredPositions = [8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15];
+        foreach ($preferredPositions as $prefPos) {
+            foreach ($allPlanetSlots as $slot) {
+                if ($slot['p'] === $prefPos && !($occupiedSlots[$slot['g']][$slot['s']][$slot['p']] ?? false)) {
+                    $playerSlot = $slot;
+                    break 2;
+                }
             }
         }
 
         if ($playerSlot) {
-            $planetType = self::randomPlanetType($planetTypes);
+            $planetType = self::randomPlanetType($planetTypes, $galaxyConfig, $rng);
             $tempClass = self::getTempClass($playerSlot['p'], $tempModifiers);
             self::insertBody($pdo, $gameId, $playerEmpireId, $playerSlot['g'], $playerSlot['s'], $playerSlot['p'],
                 false, $planetType, $tempClass, $playerBaseFields, $typeModifiers, $planetTypes);
@@ -414,17 +429,29 @@ final class Galaxy
     }
 
     /**
-     * Sceglie un tipo di pianeta casuale pesato.
+     * Sceglie un tipo di pianeta casuale pesato in base ai pesi del config.
      */
-    private static function randomPlanetType(array $planetTypes): string
+    private static function randomPlanetType(array $planetTypes, array $galaxyConfig, \Random\Randomizer $rng): string
     {
-        // Distribuzione: 20% per ciascun tipo speciale, 20% standard
-        $rand = mt_rand(1, 100);
-        if ($rand <= 20) return 'rocky';
-        if ($rand <= 40) return 'crystalline';
-        if ($rand <= 60) return 'oceanic';
-        if ($rand <= 80) return 'desert';
-        return 'standard';
+        // Usa i pesi dal config, default 20% ciascuno
+        $weights = [];
+        foreach ($planetTypes as $type => $config) {
+            $weights[$type] = (int)($config['weight'] ?? 20);
+        }
+
+        $totalWeight = array_sum($weights);
+        $rand = $rng->getInt(1, $totalWeight);
+
+        $cumulative = 0;
+        foreach ($weights as $type => $weight) {
+            $cumulative += $weight;
+            if ($rand <= $cumulative) {
+                return $type;
+            }
+        }
+
+        // Fallback al primo tipo
+        return array_key_first($planetTypes);
     }
 
     /**

@@ -24,11 +24,12 @@ final class EventBus
      * @param string $type Tipo di evento (es. 'fleet_arrive', 'queue_retry', 'cpu_tick')
      * @param int $refId ID di riferimento (body_id, fleet_id, queue_id, empire_id, ecc.)
      * @param array $payload Dati aggiuntivi per l'handler
+     * @param bool $test Usa database di test
      * @return int ID dell'evento creato
      */
-    public static function schedule(int $gameId, float $at, string $type, int $refId, array $payload): int
+    public static function schedule(int $gameId, float $at, string $type, int $refId, array $payload, bool $test = false): int
     {
-        $pdo = Db::pdo();
+        $pdo = Db::pdo($test);
 
         $stmt = $pdo->prepare("
             INSERT INTO `events` (`game_id`, `at`, `type`, `ref_id`, `payload_json`, `done`)
@@ -42,9 +43,9 @@ final class EventBus
     /**
      * Cancella un evento programmato.
      */
-    public static function cancel(int $eventId): void
+    public static function cancel(int $eventId, bool $test = false): void
     {
-        $pdo = Db::pdo();
+        $pdo = Db::pdo($test);
 
         $stmt = $pdo->prepare("DELETE FROM `events` WHERE `id` = ? AND `done` = 0");
         $stmt->execute([$eventId]);
