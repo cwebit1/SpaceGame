@@ -70,8 +70,8 @@ final class Formula
 
     /**
      * Costo potenziamento livello L (incluso Lunarite da L11).
-     * $cfg deve contenere: upgrades.cost_multiplier, upgrades.lunarite_from_level,
-     * upgrades.lunarite_base, upgrades.lunarite_growth
+     * $cfg deve contenere la sezione 'upgrades' con tutte le chiavi richieste.
+     * Le chiavi sono validate da ConfigSchema.
      */
     public static function upgradeCost(array $unitCost, int $L, array $cfg): array
     {
@@ -79,10 +79,11 @@ final class Formula
             return ['m' => 0.0, 'c' => 0.0, 'd' => 0.0, 'lu' => 0.0];
         }
 
-        $growth = $cfg['upgrades']['cost_multiplier'] ?? 1.25;
-        $luFromLevel = (int)($cfg['upgrades']['lunarite_from_level'] ?? 11);
-        $luBase = (float)($cfg['upgrades']['lunarite_base'] ?? 50);
-        $luGrowth = (float)($cfg['upgrades']['lunarite_growth'] ?? 1.25);
+        // Chiavi obbligatorie - niente default silenziosi (E3)
+        $growth = (float)$cfg['upgrades']['cost_multiplier'];
+        $luFromLevel = (int)$cfg['upgrades']['lunarite_from_level'];
+        $luBase = (float)$cfg['upgrades']['lunarite_base'];
+        $luGrowth = (float)$cfg['upgrades']['lunarite_growth'];
 
         $cost = self::cost($unitCost, $growth, $L);
 
