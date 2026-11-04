@@ -56,8 +56,8 @@
 - Tutti i task (1-5) completati con test verdi.
 - Task 7 WIP salvato (`wip: Task 7`) per Milestone B.
 - File di progetto salvati (`chore: file di progetto`).
-- Revisione Qwen milestone A: GESTITA — file template (nessun errore da Qwen). Vedi `docs/reviews/milestone-A/soluzioni.md#Esito`.
-- Il tag `milestone-A` esiste sul commit 24c4943; conferma se aggiornarlo al commit corrente (110e7e3).
+- Revisione Qwen milestone A: **IN ATTESA DELLE RISPOSTE DI QWEN** — `errori.md` e `soluzioni.md` sono template non compilati.
+- Il tag `milestone-A` spostato su commit `a8d9da2` (Task 5 completo).
 
 ---
 
