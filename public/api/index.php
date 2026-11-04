@@ -21,6 +21,8 @@ require_once __DIR__ . '/../../core/bootstrap.php';
 
 use SpaceGame\Api\AuthController;
 use SpaceGame\Api\GamesController;
+use SpaceGame\Api\BuildController;
+use SpaceGame\Api\BodyController;
 
 // CORS headers per sviluppo (in produzione limitare agli origin consentiti)
 header('Access-Control-Allow-Origin: *');
@@ -66,6 +68,30 @@ try {
     } elseif (preg_match('#^/api/games/(\d+)/generate-galaxy$#', $path, $matches) && $method === 'POST') {
         $_SERVER['GAME_ID'] = (int)$matches[1];
         GamesController::generateGalaxy();
+    }
+    // Build endpoints
+    elseif (preg_match('#^/api/games/(\d+)/build$#', $path, $matches) && $method === 'POST') {
+        $_SERVER['GAME_ID'] = (int)$matches[1];
+        BuildController::queue();
+    } elseif (preg_match('#^/api/games/(\d+)/build/(\d+)$#', $path, $matches) && $method === 'DELETE') {
+        $_SERVER['GAME_ID'] = (int)$matches[1];
+        $_SERVER['QUEUE_ID'] = (int)$matches[2];
+        BuildController::cancel();
+    } elseif (preg_match('#^/api/games/(\d+)/build/reorder$#', $path, $matches) && $method === 'POST') {
+        $_SERVER['GAME_ID'] = (int)$matches[1];
+        BuildController::reorder();
+    } elseif (preg_match('#^/api/games/(\d+)/build/queue$#', $path, $matches) && $method === 'GET') {
+        $_SERVER['GAME_ID'] = (int)$matches[1];
+        BuildController::list();
+    }
+    // Body endpoints
+    elseif (preg_match('#^/api/games/(\d+)/bodies$#', $path, $matches) && $method === 'GET') {
+        $_SERVER['GAME_ID'] = (int)$matches[1];
+        BodyController::list();
+    } elseif (preg_match('#^/api/games/(\d+)/bodies/(\d+)$#', $path, $matches) && $method === 'GET') {
+        $_SERVER['GAME_ID'] = (int)$matches[1];
+        $_SERVER['BODY_ID'] = (int)$matches[2];
+        BodyController::get();
     } else {
         http_response_code(404);
         header('Content-Type: application/json; charset=utf-8');

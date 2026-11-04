@@ -197,6 +197,46 @@
       "energy": { "flat_per_level": 40 },
       "effect": { "mine_bonus_pct": 0.03 },
       "fields": 1
+    },
+    "nanite_factory": {
+      "cost": { "m": 1000000, "c": 500000, "d": 100000, "lu": 0 },
+      "growth": 1.8,
+      "requires": { "building.robot_factory": 10, "research.computer_tech": 10 },
+      "energy": { "flat_per_level": 0 },
+      "effect": { "time_factor": { "a": 0.25, "b": 1.0 } },
+      "fields": 0
+    },
+    "robot_factory": {
+      "cost": { "m": 400, "c": 120, "d": 200, "lu": 0 },
+      "growth": 1.7,
+      "requires": {},
+      "energy": { "flat_per_level": 0 },
+      "effect": { "build_time_factor": { "a": 0.15, "b": 1.0 } },
+      "fields": 1
+    },
+    "research_lab": {
+      "cost": { "m": 200, "c": 400, "d": 200, "lu": 0 },
+      "growth": 1.7,
+      "requires": {},
+      "energy": { "flat_per_level": 0 },
+      "effect": { "research_time_factor": { "a": 0.25, "b": 1.0 } },
+      "fields": 1
+    },
+    "construction_hub": {
+      "cost": { "m": 50000, "c": 30000, "d": 10000, "lu": 0 },
+      "growth": 1.8,
+      "requires": { "research.logistics": 4, "building.robot_factory": 8 },
+      "energy": { "flat_per_level": 50 },
+      "effect": { "parallel_build_slots_per_5_levels": 1 },
+      "fields": 1
+    },
+    "terraformer": {
+      "cost": { "m": 0, "c": 50000, "d": 100000, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "research.terraforming": 1, "building.nanite_factory": 1 },
+      "energy": { "flat_per_level": 50 },
+      "effect": { "fields_bonus": 200 },
+      "fields": 0
     }
   },
   "moon_buildings": {

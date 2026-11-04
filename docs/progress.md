@@ -57,6 +57,7 @@
 - Task 7 WIP salvato (`wip: Task 7`) per Milestone B.
 - File di progetto salvati (`chore: file di progetto`).
 - Revisione Qwen milestone A: **IN ATTESA DELLE RISPOSTE DI QWEN** — `errori.md` e `soluzioni.md` sono template non compilati.
+  - Revisione non pronta: vale la regola del punto 2 di `PROMPT-MILESTONE.md` (saltala e prosegui con la milestone B).
 - Il tag `milestone-A` spostato su commit `a8d9da2` (Task 5 completo).
 
 ---
@@ -68,6 +69,40 @@
 - [x] Step 2-4: FAIL → implementa → PASS. Commit.
 
 **Commit:** 8b45131
+**Stato:** COMPLETATO
+
+---
+
+### Task 7: Economia ed Energia
+- [x] Step 1: Test: `test_rates_metal_crystal_deuterium`, `test_solar_plant_output_formula`, `test_fusion_reactor_output_formula`, `test_energy_balance_positive`, `test_energy_balance_negative`, `test_storage_capacity`, `test_update_resources_to_now`, `test_energy_affects_production`.
+- [x] Step 2-4: FAIL → implementa `Economy::ratesPerHour`, `Economy::updateToNow`, `Energy::output`, `Energy::balance` → PASS. Commit.
+
+**Commit:** [pending]
+**Stato:** COMPLETATO
+
+---
+
+### Task 8: Code (Build/Research/Shipyard/Upgrade/Silo) con prerequisiti e campi
+- [x] Step 1: Test: `test_cost_scaled_at_start_not_enqueue`, `test_waiting_item_starts_at_exact_time`, `test_parallel_slots_from_construction_hub`, `test_requirements_block_queue`, `test_fields_full_blocks_build`, `test_terraformer_adds_200_without_using_field`, `test_research_uses_lab_and_nanite_of_start_body`, `test_nanite_level_2_divides_by_16`, `test_cancel_refunds_running_item`.
+- [x] Step 2-4: FAIL → implementa `Queue` (enqueue/tryStart/reorder/cancel/calculateCost/calculateDuration/calculateResourceReadyTime + slot paralleli Construction Hub), `Requirements` (met/missing con building.* e research.*) , `Fields` (total/used/canBuild/applyBattle + Terraformer bonus) → PASS. Commit.
+- [x] Actions\Build.php — accoda/cancella/riordina edifici (verifica prerequisiti, campi, proprietà)
+- [x] Actions\Research.php — accoda/cancella/riordina ricerche (usa Lab/Naniti del pianeta di avvio)
+
+**Commit:** [pending]
+**Stato:** COMPLETATO
+
+---
+
+### Task 8b: Pagina minima giocabile
+- [x] POST /api/games/{id}/build (BuildController::queue)
+- [x] DELETE /api/games/{id}/build/{queueId} (BuildController::cancel)
+- [x] POST /api/games/{id}/build/reorder (BuildController::reorder)
+- [x] GET /api/games/{id}/build/queue?body_id=X (BuildController::list)
+- [x] GET /api/games/{id}/bodies (BodyController::list)
+- [x] GET /api/games/{id}/bodies/{bodyId} (BodyController::get)
+- [x] public/index.html + public/js/mini.js — Login → elenco pianeti → dettaglio pianeta con code costruzione/ricerca, edifici costruibili, ricerche ricercabili
+
+**Commit:** [pending]
 **Stato:** COMPLETATO
 
 ## Milestone C — Unità
