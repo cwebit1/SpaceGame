@@ -66,11 +66,14 @@ final class Games
         $pdo = Db::pdo($test);
 
         // Crea la partita
+        // Inizializza processed_until al timestamp corrente (ms) per evitare catch-up iniziale massiccio (E30)
+        $processedUntil = (int)round(microtime(true) * 1000);
+
         $stmt = $pdo->prepare("
             INSERT INTO `games`
-                (`user_id`, `name`, `speed`, `cpu_res_mult`, `cpu_research_mult`, `settings_json`, `config_json`)
+                (`user_id`, `name`, `speed`, `cpu_res_mult`, `cpu_research_mult`, `settings_json`, `config_json`, `processed_until`)
             VALUES
-                (?, ?, ?, ?, ?, ?, ?)
+                (?, ?, ?, ?, ?, ?, ?, ?)
         ");
 
         $name = trim($finalSettings['name'] ?? 'Test Game');
@@ -93,6 +96,7 @@ final class Games
             $cpuResearchMult,
             json_encode($finalSettings, JSON_THROW_ON_ERROR),
             $config->toJson(),
+            $processedUntil,
         ]);
 
         return (int)$pdo->lastInsertId();
