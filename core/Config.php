@@ -27,7 +27,7 @@ final class Config
     }
 
     /**
-     * Carica la configurazione da file JSON.
+     * Carica la configurazione da file JSON e valida lo schema.
      */
     public static function fromFile(string $path): self
     {
@@ -47,19 +47,25 @@ final class Config
             throw new ConfigError("Il file {$path} deve contenere un oggetto JSON");
         }
 
+        // Valida lo schema (E27)
+        ConfigSchema::validate($data);
+
         return new self($data, $path);
     }
 
     /**
      * Crea una configurazione da array (per test).
+     * Valida lo schema (E27).
      */
     public static function fromArray(array $data): self
     {
+        ConfigSchema::validate($data);
         return new self($data, 'array');
     }
 
     /**
      * Crea una configurazione da stringa JSON.
+     * Valida lo schema (E27).
      */
     public static function fromJson(string $json): self
     {
@@ -70,6 +76,7 @@ final class Config
         if (!is_array($data)) {
             throw new ConfigError("Il JSON deve contenere un oggetto");
         }
+        ConfigSchema::validate($data);
         return new self($data, 'json');
     }
 

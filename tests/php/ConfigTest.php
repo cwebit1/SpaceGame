@@ -16,19 +16,13 @@ final class ConfigTest extends TestCase
 {
     public function test_get_dot_path(): void
     {
-        $config = Config::fromArray([
-            'ships' => [
-                'light_fighter' => [
-                    'attack' => 45,
-                ],
-            ],
-        ]);
+        $config = Config::fromFile(__DIR__ . '/../../game_config.json');
         $this->assertSame(45, $config->get('ships.light_fighter.attack'));
     }
 
     public function test_missing_key_names_path(): void
     {
-        $config = Config::fromArray(['ships' => []]);
+        $config = Config::fromFile(__DIR__ . '/../../game_config.json');
         $this->expectException(ConfigError::class);
         $this->expectExceptionMessage('ships.nope');
         $config->get('ships.nope');

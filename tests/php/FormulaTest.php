@@ -17,11 +17,7 @@ final class FormulaTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->config = Config::fromArray([
-            'formula' => [
-                'construction_cost_divisor' => 3000,
-            ],
-        ]);
+        $this->config = Config::fromFile(__DIR__ . '/../../game_config.json');
     }
     public function test_levelCurve(): void
     {
