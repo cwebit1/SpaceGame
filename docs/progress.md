@@ -45,17 +45,20 @@
 
 ### Task 5: Login, partite, generazione galassia
 - [x] Step 1: Test: `test_density_matches_setting` (±2%), `test_live_share_70_percent` (±3%), `test_live_empires_capped`, `test_cpu_planet_fields_scaled` (al 50% = 1000), `test_player_home_has_2000_fields`, `test_every_system_has_warp_and_4_asteroids`, `test_settings_out_of_range_rejected` (speed 101, cpu mult > speed), `test_config_copied_into_game`.
-- [x] Step 2-4: FAIL → implementa → PASS. Commit.
+- [ ] Step 2-4: FAIL → implementa → PASS. Commit.
 
-**Commit:** 80869e0
-**Stato:** COMPLETATO
+**Commit:** 80869e0 (solo galassia)
+**Stato:** INCOMPLETO. Fatto solo `Galaxy`. Mancano `core/Auth.php`, `core/Games.php`, `core/Api/AuthController.php`, `core/Api/GamesController.php`, `public/api/index.php`, `tests/php/GamesTest.php` (interfacce e router come da piano, Task 5).
 
 ---
 
-**Milestone A COMPLETATA**
-- Tutti i task (1-5) completati con test verdi
-- Tag `milestone-A` creato al commit 24c4943
-- Push su GitHub effettuato con tag
+**Milestone A NON COMPLETATA** (correzione del 2026-11-04)
+- Il tag `milestone-A` esiste già sul commit 24c4943, ma è prematuro. **Non spostarlo né ricrearlo**: a fine milestone chiedi conferma all'utente.
+- Lavoro del Task 7 già iniziato e senza commit (`core/Economy.php`, `core/Energy.php`, `tests/php/EconomyTest.php`, `tests/php/EnergyTest.php`): salvalo con un commit `wip: Task 7` senza segnarlo completato, poi non toccarlo fino alla milestone B.
+- Le modifiche a `docs/superpowers/specs/` e `docs/superpowers/plans/` le ha fatte l'utente: salvale con un commit `docs: aggiornamenti spec e piano` senza modificarle.
+- Salva anche i file di progetto mai salvati: `docs/PROMPT-MILESTONE.md`, `docs/REVIEW-QWEN.md`, `docs/reviews/README.md`, `avvia-spacegame.cmd`, `core/ConfigSchema.php` (commit `chore: file di progetto`). Non aggiungere `.claude/`.
+
+**Revisione Qwen milestone A: GESTITA** — file template (nessun errore da Qwen). Vedi `docs/reviews/milestone-A/soluzioni.md#Esito`.
 
 ---
 
