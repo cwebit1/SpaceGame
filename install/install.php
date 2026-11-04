@@ -47,8 +47,10 @@ try {
     ]);
 
     // Crea database se non esiste
-    $pdoNoDb->exec("CREATE DATABASE IF NOT EXISTS `{$config['name']}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-    echo "Database '{$config['name']}' pronto.\n";
+    // Escape database name to prevent backtick injection
+    $dbName = str_replace('`', '``', $config['name']);
+    $pdoNoDb->exec("CREATE DATABASE IF NOT EXISTS `$dbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+    echo "Database '$dbName' pronto.\n";
 
     // Connessione al DB specifico
     $dsn = "mysql:host={$config['host']};port={$config['port']};dbname={$config['name']};charset=utf8mb4";
@@ -113,7 +115,7 @@ try {
     $pdo->exec('SET FOREIGN_KEY_CHECKS = 1');
 
     echo "\n✓ Installazione completata con successo!\n";
-    echo "Tabelle create nel database '{$config['name']}'.\n";
+    echo "Tabelle create nel database '$dbName'.\n";
 
 } catch (PDOException $e) {
     echo "✗ Errore database: " . $e->getMessage() . "\n";

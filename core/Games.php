@@ -73,7 +73,14 @@ final class Games
                 (?, ?, ?, ?, ?, ?, ?)
         ");
 
-        $name = $finalSettings['name'] ?? 'Test Game';
+        $name = trim($finalSettings['name'] ?? 'Test Game');
+        // Valida nome partita
+        if ($name === '') {
+            throw new RuntimeException('Nome partita non può essere vuoto');
+        }
+        if (strlen($name) > 100) {
+            throw new RuntimeException('Nome partita troppo lungo (max 100 caratteri)');
+        }
         $speed = (float)$finalSettings['speed'];
         $cpuResMult = (float)$finalSettings['cpu_res_mult'];
         $cpuResearchMult = (float)$finalSettings['cpu_research_mult'];

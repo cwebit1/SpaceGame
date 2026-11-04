@@ -16,6 +16,8 @@ final class Db
     private static ?PDO $pdoTest = null;
     private static ?array $config = null;
     private static ?array $configTest = null;
+    /** @var array<string, int> Lock name -> recursion count */
+    private static array $locksHeld = [];
 
     /**
      * Carica la configurazione dal file config.local.php.
@@ -159,6 +161,7 @@ final class Db
      * Esegue un callback con un lock advisory su game_id (GET_LOCK).
      * Se il lock non è acquisibile (già preso), lancia LockBusyException.
      * Il lock viene rilasciato automaticamente a fine callback (RELEASE_LOCK).
+     * Supporta lock ricorsivi (reentrant) nello stesso processo.
      *
      * @template T
      * @param int $gameId
@@ -171,6 +174,20 @@ final class Db
     public static function withGameLock(int $gameId, callable $callback, int $timeoutSecondi = 5, bool $test = false)
     {
         $lockName = "spacegame_game_{$gameId}";
+
+        // Controlla se il lock è già detenuto da questo processo (reentrant)
+        if (isset(self::$locksHeld[$lockName])) {
+            self::$locksHeld[$lockName]++;
+            try {
+                return $callback();
+            } finally {
+                self::$locksHeld[$lockName]--;
+                if (self::$locksHeld[$lockName] <= 0) {
+                    unset(self::$locksHeld[$lockName]);
+                }
+            }
+        }
+
         $pdo = self::pdo($test);
 
         // Tenta di acquisire il lock
@@ -182,11 +199,19 @@ final class Db
             throw new LockBusyException("Lock su game_id=$gameId non acquisito (timeout {$timeoutSecondi}s)");
         }
 
+        // Marca il lock come detenuto
+        self::$locksHeld[$lockName] = 1;
+
         try {
             return $callback();
         } finally {
-            // Rilascia sempre il lock
-            $pdo->prepare("SELECT RELEASE_LOCK(?)")->execute([$lockName]);
+            // Decrementa contatore e rilascia se arrivato a 0
+            self::$locksHeld[$lockName]--;
+            if (self::$locksHeld[$lockName] <= 0) {
+                unset(self::$locksHeld[$lockName]);
+                // Rilascia il lock nel database
+                $pdo->prepare("SELECT RELEASE_LOCK(?)")->execute([$lockName]);
+            }
         }
     }
 

@@ -266,7 +266,7 @@ CREATE TABLE IF NOT EXISTS `asteroid_progress` (
     `stratum` INT UNSIGNED NOT NULL DEFAULT 1,
     `remaining` DOUBLE NOT NULL DEFAULT 0,
     `day` DATE NOT NULL,
-    PRIMARY KEY (`empire_id`, `g`, `s`, `p`),
+    PRIMARY KEY (`empire_id`, `g`, `s`, `p`, `stratum`, `day`),
     CONSTRAINT `fk_asteroid_progress_empire` FOREIGN KEY (`empire_id`) REFERENCES `empires` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
