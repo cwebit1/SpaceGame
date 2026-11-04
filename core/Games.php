@@ -104,20 +104,21 @@ final class Games
 
     /**
      * Valida le impostazioni della partita secondo i range in config.
-     * Logica duplicata da Galaxy per validazione anticipata.
+     * Usa gli stessi default di Games::defaultSettings() per coerenza.
      */
     private static function validateSettings(array $settings, Config $config): void
     {
         $settingsConfig = $config->get('settings');
+        $defaultsConfig = $settingsConfig['defaults'] ?? [];
 
         // Velocità player
-        $speed = (float)($settings['speed'] ?? 1);
+        $speed = (float)($settings['speed'] ?? ($defaultsConfig['speed'] ?? 1));
         if ($speed < $settingsConfig['player_speed_min'] || $speed > $settingsConfig['player_speed_max']) {
             throw new RuntimeException("speed deve essere tra {$settingsConfig['player_speed_min']} e {$settingsConfig['player_speed_max']}");
         }
 
         // CPU resource multiplier
-        $cpuResMult = (float)($settings['cpu_res_mult'] ?? 1);
+        $cpuResMult = (float)($settings['cpu_res_mult'] ?? ($defaultsConfig['cpu_res_mult'] ?? 1));
         if ($cpuResMult < $settingsConfig['cpu_resource_mult_min'] || $cpuResMult > $settingsConfig['cpu_resource_mult_max']) {
             throw new RuntimeException("cpu_res_mult deve essere tra {$settingsConfig['cpu_resource_mult_min']} e {$settingsConfig['cpu_resource_mult_max']}");
         }
@@ -126,7 +127,7 @@ final class Games
         }
 
         // CPU research multiplier
-        $cpuResearchMult = (float)($settings['cpu_research_mult'] ?? 1);
+        $cpuResearchMult = (float)($settings['cpu_research_mult'] ?? ($defaultsConfig['cpu_research_mult'] ?? 1));
         if ($cpuResearchMult < $settingsConfig['cpu_research_mult_min'] || $cpuResearchMult > $settingsConfig['cpu_research_mult_max']) {
             throw new RuntimeException("cpu_research_mult deve essere tra {$settingsConfig['cpu_research_mult_min']} e {$settingsConfig['cpu_research_mult_max']}");
         }
@@ -135,25 +136,25 @@ final class Games
         }
 
         // Galassie
-        $galaxies = (int)($settings['galaxies'] ?? 1);
+        $galaxies = (int)($settings['galaxies'] ?? ($defaultsConfig['galaxies'] ?? ($settingsConfig['galaxy_count_min'] ?? 3)));
         if ($galaxies < $settingsConfig['galaxy_count_min'] || $galaxies > $settingsConfig['galaxy_count_max']) {
             throw new RuntimeException("galaxies deve essere tra {$settingsConfig['galaxy_count_min']} e {$settingsConfig['galaxy_count_max']}");
         }
 
         // Sistemi per galassia
-        $systemsPerGalaxy = (int)($settings['systems_per_galaxy'] ?? 1);
+        $systemsPerGalaxy = (int)($settings['systems_per_galaxy'] ?? ($defaultsConfig['systems_per_galaxy'] ?? ($settingsConfig['system_count_min'] ?? 100)));
         if ($systemsPerGalaxy < $settingsConfig['system_count_min'] || $systemsPerGalaxy > $settingsConfig['system_count_max']) {
             throw new RuntimeException("systems_per_galaxy deve essere tra {$settingsConfig['system_count_min']} e {$settingsConfig['system_count_max']}");
         }
 
         // Densità CPU
-        $cpuDensity = (float)($settings['cpu_density'] ?? 0);
+        $cpuDensity = (float)($settings['cpu_density'] ?? ($defaultsConfig['cpu_density'] ?? ($settingsConfig['cpu_density_min'] ?? 40)));
         if ($cpuDensity < $settingsConfig['cpu_density_min'] || $cpuDensity > $settingsConfig['cpu_density_max']) {
             throw new RuntimeException("cpu_density deve essere tra {$settingsConfig['cpu_density_min']} e {$settingsConfig['cpu_density_max']}");
         }
 
         // CPU planet size
-        $cpuPlanetSize = (float)($settings['cpu_planet_size'] ?? 10);
+        $cpuPlanetSize = (float)($settings['cpu_planet_size'] ?? ($defaultsConfig['cpu_planet_size'] ?? ($settingsConfig['cpu_planet_size_min'] ?? 50)));
         if ($cpuPlanetSize < $settingsConfig['cpu_planet_size_min'] || $cpuPlanetSize > $settingsConfig['cpu_planet_size_max']) {
             throw new RuntimeException("cpu_planet_size deve essere tra {$settingsConfig['cpu_planet_size_min']} e {$settingsConfig['cpu_planet_size_max']}");
         }
