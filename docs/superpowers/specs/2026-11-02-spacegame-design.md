@@ -307,7 +307,7 @@ Iniziativa difese +1%/livello Computer.
 - **Sosta obbligatoria**: ogni flotta arrivata (volo o teletrasporto) attende **30 s reali** prima di ripartire.
 - **Saccheggio**: fino al **100%** delle risorse oltre la quota protetta, limitato dalla stiva; riempimento bilanciato M/C/D/Lu con priorità impostabile.
 - **Anti-spazzolatura**: lo stesso attaccante può attaccare lo stesso corpo max 3 volte ogni 24 h di gioco.
-- **Spionaggio**: punteggio = sonde + 2×(Spionaggio att − Spionaggio dif). ≥0 risorse · ≥2 flotta · ≥3 difese · ≥5 strutture · ≥7 ricerca. Rilevazione = clamp(5% + 5%×(Spy dif − Spy att) + 2%×Controspionaggio + 10%×Intelligence Agency, 0, 95%); se rilevate le sonde combattono e vengono distrutte. Report mostra bottino saccheggiabile, PF, resistenza luna.
+- **Spionaggio**: punteggio = sonde + 2×(Spionaggio att − Spionaggio dif). ≥0 risorse · ≥2 flotta · ≥3 difese · ≥5 strutture · ≥7 ricerca. Rilevazione = clamp(5% + 5%×(Spy dif − Spy att) + 2%×Controspionaggio + 10%×Intelligence Agency, 0, 95%); se rilevate le sonde combattono e vengono distrutte. Report mostra bottino saccheggiabile, PF, resistenza luna, e il pulsante **Simula**: apre il simulatore di battaglia con i difensori compilati dai dati del report e come attaccante la flotta del pianeta attivo, modificabile. I dati non rilevati restano vuoti, segnati "non rilevato", e il risultato è indicato come stima parziale. Il simulatore usa i dati del report così come sono, anche se falsati (Intelligence Agency, Decoy Generator).
 
 ---
 
@@ -409,7 +409,7 @@ DOUBLE. Visualizzazione scala lunga italiana, 2 decimali, virgola: k · Mln · M
   - pulsanti **Unità uguali / Risorse uguali / Tempi uguali**; anteprima barre per slot con trascinamento lotti;
   - **Stop** per slot in qualsiasi momento senza costi: si tengono le unità completate, le risorse delle non completate tornano intere;
   - preset salvabili.
-- **Flotte**: invio in 3 passi (navi con slider → bersaglio → missione/velocità) con consumo, tempo, PF relativa; simulatore di battaglia; regole di ritiro Gauntlet.
+- **Flotte**: invio in 3 passi (navi con slider → bersaglio → missione/velocità) con consumo, tempo, PF relativa; simulatore di battaglia; regole di ritiro Gauntlet. Il simulatore esegue `combat.simulator_runs` (5) battaglie e mostra una stima: percentuali di vittoria/pareggio/sconfitta; barra totale della flotta inviata divisa tra sopravvissuta e persa, con % persa; una barra per tipo di nave con quantità inviata, perdite medie e intervallo min–max.
 - **Mappa**: vista galassia (icone CPU, Warp, Rift, asteroidi, detriti, lune) e vista sistema (posizioni 1–20 verticali); pinch-zoom, swipe; tocco su corpo = spia/attacca/trasporta.
 - **Altro**: impero, classifica, diplomazia, mercato, registro, impostazioni partita, cambio partita, logout.
 - Timer calcolati in locale sull'orario del server.

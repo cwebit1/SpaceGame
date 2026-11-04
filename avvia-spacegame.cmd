@@ -30,7 +30,13 @@ if errorlevel 1 (
 :fcc_ok
 echo Free Claude Code attivo.
 
-rem 3) Nuova sessione dell'agente sulla prossima milestone
+rem 3) File temporanei dell'agente dentro il progetto (letture senza richiesta di permesso)
+if not exist "D:\CweAgent\projects\SpaceGame\.tmp" mkdir "D:\CweAgent\projects\SpaceGame\.tmp"
+set "TEMP=D:\CweAgent\projects\SpaceGame\.tmp"
+set "TMP=D:\CweAgent\projects\SpaceGame\.tmp"
+set "CLAUDE_CODE_TMPDIR=D:\CweAgent\projects\SpaceGame\.tmp"
+
+rem 4) Nuova sessione dell'agente sulla prossima milestone
 call "D:\CweAgent\tools\free-claude-code\fcc-claude.cmd" --permission-mode acceptEdits %* "Leggi docs/PROMPT-MILESTONE.md e seguilo alla lettera."
 exit /b 0
 

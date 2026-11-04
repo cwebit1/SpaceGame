@@ -20,6 +20,7 @@ Sei lo sviluppatore di SpaceGame.
    - non inserire mai credenziali (`config.local.php` lo compila l'utente; in locale DB `root` senza password su `127.0.0.1`);
    - spunta le caselle `- [x]` del piano man mano;
    - nei comandi Bash usa percorsi relativi alla cartella del progetto o con `/`, mai con `\` (altrimenti il controllo dei permessi non li riconosce e chiede conferma);
+   - lancia test e comandi **in primo piano** e leggi direttamente il loro output: mai `sleep`, mai comandi in background, mai `cat` di file di output in cartelle temporanee; usa solo percorsi dentro il progetto;
    - mai scrivere più di circa 150 righe in una sola scrittura: i file grandi (es. `game_config.json`, schema SQL, PWA) vanno creati a sezioni, prima lo scheletro e poi una sezione per volta con Edit, verificando dopo ogni sezione (le risposte troppo lunghe vanno in timeout sul provider).
 5. Fermati prima della fine **solo** se: un valore della specifica manca o è ambiguo, oppure i test non passano dopo 3 tentativi. In quel caso spiega il problema e aspetta.
 6. A fine milestone:

@@ -209,6 +209,20 @@ docs/deploy-aruba.md
 - [ ] **Step 1:** Test: `test_cost_scaled_at_start_not_enqueue`, `test_waiting_item_starts_at_exact_time`, `test_parallel_slots_from_construction_hub`, `test_requirements_block_queue`, `test_fields_full_blocks_build`, `test_terraformer_adds_200_without_using_field`, `test_research_uses_lab_and_nanite_of_start_body`, `test_nanite_level_2_divides_by_16`, `test_cancel_refunds_running_item`.
 - [ ] **Step 2-4:** FAIL → implementa → PASS. Commit.
 
+### Task 8b: Pagina minima giocabile
+
+**Files:** Create `public/index.html`, `public/js/mini.js`, `core/Api/BodyController.php`, `tests/php/BodyApiTest.php`
+
+Pagina semplice, senza grafica definitiva, per provare il gioco dal browser dopo la milestone B.
+- Accesso con il login del Task 5, apertura del pianeta madre del player.
+- `GET /api/body/{id}`: nome, risorse, produzione/h, capacità, energia, livelli di miniere ed energia, coda. Chiama prima `Clock::catchUp`.
+- Costi e tempi da `game_config.json`, valori mai scritti nel JS.
+- Mostra Metallo, Cristallo, Deuterio ed energia con contatori che salgono in tempo reale, livello di ogni miniera, costo e tempo del prossimo livello, pulsante Potenzia (`Actions\Build::queue`) e coda con timer.
+- Numeri nella scala lunga italiana (`Format`). Nessuna PWA, nessuna altra schermata.
+- [ ] **Step 1:** Test: `test_body_state_requires_login`, `test_body_of_other_empire_rejected`, `test_body_state_applies_catchup`, `test_upgrade_mine_enters_queue`.
+- [ ] **Step 2-4:** FAIL → implementa → PASS. Commit.
+- [ ] **Verifica manuale:** Enrico apre la pagina, vede le risorse salire e potenzia una miniera.
+
 ---
 
 ## Milestone C — Unità
@@ -375,6 +389,8 @@ docs/deploy-aruba.md
 
 ## Milestone I — Interfaccia
 
+Le schermate definitive sostituiscono la pagina minima del Task 8b, riusando le sue API.
+
 Ogni task UI: verifica manuale con viewport 375×812 (DevTools Android) + test JS delle funzioni pure. Nessuna logica di gioco nel JS: il JS chiama le API e anima i timer da `serverTime`.
 
 ### Task 20: Shell PWA, login, partite, barra alta/bassa
@@ -403,6 +419,8 @@ Ogni task UI: verifica manuale con viewport 375×812 (DevTools Android) + test J
 
 **Files:** Create `public/js/views/fleet.js`, `public/js/views/map.js`, `public/js/views/more.js`
 - Invio flotta in 3 passi con anteprima consumo/tempo/PF relativa (da `GET /api/fleet/preview`), simulatore (`POST /api/combat/simulate`), regole Gauntlet.
+- Simulatore: aggiungi `combat.simulator_runs: 5` a `game_config.json`; esegue `Combat::simulate` con quel numero di seed diversi e restituisce percentuali di vittoria/pareggio/sconfitta, perdite medie e min–max per tipo di nave. Grafico (§18, Flotte): barra totale sopravvissuta/persa con % persa, una barra per tipo di nave.
+- Report di spionaggio: pulsante **Simula** (§10) che apre il simulatore con difensori dal report e attaccante dalla flotta del pianeta attivo, modificabile; dati non rilevati segnati "non rilevato" e risultato indicato come stima parziale.
 - Mappa galassia (griglia sistemi con icone) e sistema (posizioni 1–20), pinch-zoom (pointer events), swipe tra sistemi.
 - Altro: impero, classifica, diplomazia, mercato, registro, impostazioni partita (solo moltiplicatori CPU modificabili), "aggiorna parametri", cambio partita, logout.
 - [ ] Verifica manuale end-to-end: crea partita x100, costruisci miniera, invia sonda, attacca un pianeta semplificato, controlla report. Commit.
