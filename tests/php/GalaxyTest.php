@@ -28,6 +28,14 @@ class GalaxyTest extends TestCase
         try {
             $pdo = Db::pdo(true);
             $pdo->query('SELECT 1');
+
+            // Pulisce le tabelle per isolamento tra test
+            $pdo->exec("SET FOREIGN_KEY_CHECKS = 0");
+            $pdo->exec("TRUNCATE TABLE `empires`");
+            $pdo->exec("TRUNCATE TABLE `bodies`");
+            $pdo->exec("TRUNCATE TABLE `games`");
+            $pdo->exec("TRUNCATE TABLE `users`");
+            $pdo->exec("SET FOREIGN_KEY_CHECKS = 1");
         } catch (\Throwable $e) {
             $this->markTestSkipped("Database di test non disponibile: " . $e->getMessage());
         }

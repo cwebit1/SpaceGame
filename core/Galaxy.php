@@ -20,12 +20,18 @@ final class Galaxy
      * @param int $gameId ID della partita
      * @param Config $config Configurazione di gioco
      * @param bool $test Usa database di test
+     * @param int|null $seed Seed opzionale per generazione deterministica
      * @throws RuntimeException se le impostazioni non sono valide
      */
-    public static function generate(int $gameId, Config $config, bool $test = false): void
+    public static function generate(int $gameId, Config $config, bool $test = false, ?int $seed = null): void
     {
         $pdo = Db::pdo($test);
         $settings = self::getGameSettings($pdo, $gameId);
+
+        // Imposta seed per generazione deterministica
+        if ($seed !== null) {
+            mt_srand($seed);
+        }
 
         // 1. Valida impostazioni
         self::validateSettings($settings, $config);
@@ -50,7 +56,8 @@ final class Galaxy
             $cpuDensity,
             $cpuLiveShare,
             $maxLiveEmpires,
-            $cpuPlanetSizePct
+            $cpuPlanetSizePct,
+            $seed
         );
 
         // 4. Popola corpi celesti (pianeti, warp, asteroidi)
@@ -63,7 +70,8 @@ final class Galaxy
             $systemsPerGalaxy,
             $cpuDensity,
             $cpuPlanetSizePct,
-            $config
+            $config,
+            $seed
         );
 
         // 5. Copia configurazione nella partita (config_json)
@@ -174,7 +182,8 @@ final class Galaxy
         float $cpuDensity,
         float $cpuLiveShare,
         int $maxLiveEmpires,
-        float $cpuPlanetSizePct
+        float $cpuPlanetSizePct,
+        ?int $seed
     ): array {
         // Calcola posizioni pianeta totali disponibili (posizioni 1-15 per sistema)
         $totalPlanetPositions = $galaxyCount * $systemsPerGalaxy * 15;
@@ -264,7 +273,8 @@ final class Galaxy
         int $systemsPerGalaxy,
         float $cpuDensity,
         float $cpuPlanetSizePct,
-        Config $config
+        Config $config,
+        ?int $seed
     ): void {
         $galaxyConfig = $config->get('galaxy');
         $moonConfig = $config->get('moon');

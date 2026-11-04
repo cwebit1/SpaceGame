@@ -70,6 +70,86 @@
       "effect": { "production_metal": { "a": 40, "b": 1.08 } },
       "fields": 1
     },
+    "crystal_mine": {
+      "cost": { "m": 60, "c": 35, "d": 0, "lu": 0 },
+      "growth": 1.6,
+      "requires": {},
+      "energy": { "a": 9, "b": 1.07 },
+      "effect": { "production_crystal": { "a": 25, "b": 1.08 } },
+      "fields": 1
+    },
+    "deuterium_synthesizer": {
+      "cost": { "m": 220, "c": 70, "d": 0, "lu": 0 },
+      "growth": 1.55,
+      "requires": {},
+      "energy": { "a": 12, "b": 1.07 },
+      "effect": { "production_deuterium": { "a": 12, "b": 1.08 } },
+      "fields": 1
+    },
+    "power_plant": {
+      "cost": { "m": 50, "c": 20, "d": 0, "lu": 0 },
+      "growth": 1.5,
+      "requires": {},
+      "energy": { "flat_per_level": 0 },
+      "effect": { "energy": { "a": 12, "b": 1.06 } },
+      "fields": 1
+    },
+    "solar_plant": {
+      "cost": { "m": 70, "c": 30, "d": 0, "lu": 0 },
+      "growth": 1.55,
+      "requires": {},
+      "energy": { "flat_per_level": 0 },
+      "effect": { "energy": { "a": 22, "b": 1.08 } },
+      "fields": 1
+    },
+    "geothermal_plant": {
+      "cost": { "m": 300, "c": 150, "d": 0, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "research.geology": 1 },
+      "energy": { "flat_per_level": 0 },
+      "effect": { "energy": { "a": 30, "b": 1.08 } },
+      "fields": 1
+    },
+    "nuclear_plant": {
+      "cost": { "m": 600, "c": 300, "d": 0, "lu": 0 },
+      "growth": 1.75,
+      "requires": { "research.nuclear_physics": 1, "research.robotics": 3 },
+      "energy": { "flat_per_level": 0 },
+      "effect": { "energy": { "a": 28, "b": 1.15 } },
+      "fields": 1
+    },
+    "fusion_plant": {
+      "cost": { "m": 900, "c": 360, "d": 180, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "research.energy_tech": 3, "building.deuterium_synthesizer": 5 },
+      "energy": { "a": 6, "b": 1.08 },
+      "effect": { "energy": { "a": 35, "b": 1.09 } },
+      "fields": 1
+    },
+    "antimatter_reactor": {
+      "cost": { "m": 200000, "c": 150000, "d": 50000, "lu": 10000 },
+      "growth": 1.8,
+      "requires": { "research.antimatter_physics": 1, "building.lunar_nanoforge": 3 },
+      "energy": { "a": 2, "b": 1.1 },
+      "effect": { "energy": { "a": 500, "b": 1.12 } },
+      "fields": 1
+    },
+    "solar_satellite": {
+      "cost": { "m": 0, "c": 2000, "d": 500, "lu": 0 },
+      "growth": 1.0,
+      "requires": { "research.orbital_tech": 1, "building.crystal_mine": 1 },
+      "energy": { "flat_per_level": 0 },
+      "effect": { "energy_per_unit": 25 },
+      "fields": 0
+    },
+    "energy_storage": {
+      "cost": { "m": 2000, "c": 3000, "d": 0, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "research.orbital_tech": 2 },
+      "energy": { "flat_per_level": 0 },
+      "effect": { "capacity": { "a": 5000, "b": 1.6 } },
+      "fields": 1
+    },
     "metal_storage": {
       "cost": { "m": 1000, "c": 0, "d": 0, "lu": 0 },
       "growth": 1.7,
@@ -100,6 +180,22 @@
       "requires": { "building.lunarite_extractor": 1 },
       "energy": { "flat_per_level": 0 },
       "effect": { "capacity": { "a": 2000, "b": 1.6 } },
+      "fields": 1
+    },
+    "planetary_bunker": {
+      "cost": { "m": 10000, "c": 10000, "d": 0, "lu": 0 },
+      "growth": 1.6,
+      "requires": { "building.metal_storage": 3, "building.crystal_storage": 3, "building.deuterium_tank": 3 },
+      "energy": { "flat_per_level": 15 },
+      "effect": { "protected_bonus_pct": 0.05 },
+      "fields": 1
+    },
+    "deep_core_drill": {
+      "cost": { "m": 20000, "c": 10000, "d": 5000, "lu": 0 },
+      "growth": 1.7,
+      "requires": { "research.geology": 4, "building.metal_mine": 10, "building.robot_factory": 5 },
+      "energy": { "flat_per_level": 40 },
+      "effect": { "mine_bonus_pct": 0.03 },
       "fields": 1
     }
   },
