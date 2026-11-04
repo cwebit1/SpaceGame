@@ -1280,6 +1280,8 @@
     "resource_multiplier_max": 1.0,
     "research_multiplier_max": 1.0,
     "difficulty_levels": ["easy", "normal", "hard", "expert"],
+    "avg_planets_per_live": 2,
+    "avg_planets_per_simple": 1,
     "personalities": {
       "aggressive": { "moon_focus": "attack_base", "upgrade_focus": "attack", "missile_strategy": "pre_attack", "market_behavior": "sell_for_fleet", "pirate_gauntlet": "warp_often", "moon_destruction": true },
       "defensive": { "moon_focus": "bulwark_defense", "upgrade_focus": "defense", "missile_strategy": "many_abm", "market_behavior": "few_offers", "pirate_gauntlet": "rare", "moon_destruction": false },

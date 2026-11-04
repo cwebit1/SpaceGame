@@ -57,7 +57,8 @@ final class Galaxy
             $cpuLiveShare,
             $maxLiveEmpires,
             $cpuPlanetSizePct,
-            $rng
+            $rng,
+            $config
         );
 
         // 4. Popola corpi celesti (pianeti, warp, asteroidi)
@@ -185,7 +186,8 @@ final class Galaxy
         float $cpuLiveShare,
         int $maxLiveEmpires,
         float $cpuPlanetSizePct,
-        \Random\Randomizer $rng
+        \Random\Randomizer $rng,
+        Config $config
     ): array {
         // Calcola posizioni pianeta totali disponibili (posizioni 1-15 per sistema)
         $totalPlanetPositions = $galaxyCount * $systemsPerGalaxy * 15;
@@ -193,17 +195,17 @@ final class Galaxy
         // Target pianeti CPU da creare (basato su densità)
         $targetCpuPlanets = (int)round($totalPlanetPositions * $cpuDensity / 100);
 
-        // Ogni impero CPU inizia con 1-3 pianeti (spec §13)
-        // Per semplicità: 2 pianeti per impero CPU vivo, 1 per semplificato
-        $avgPlanetsPerLive = 2;
-        $avgPlanetsPerSimple = 1;
+        $cpuConfig = $config->get('cpu');
+        $avgPlanetsPerLive = (int)($cpuConfig['avg_planets_per_live'] ?? 2);
+        $avgPlanetsPerSimple = (int)($cpuConfig['avg_planets_per_simple'] ?? 1);
 
         // Calcola numero imperi live target basato sulla quota di imperi (non pianeti)
         // cpuLiveShare = percentuale di imperi CPU che devono essere 'live' (es. 70%)
         // Sia L = imperi live, S = imperi simple
         // L / (L + S) = cpuLiveShare / 100
-        // Pianeti totali = L * 2 + S * 1 = targetCpuPlanets
-        // Risolvendo: L = targetCpuPlanets * cpuLiveShare / (cpuLiveShare + 100)
+        // Pianeti totali = L * avgPlanetsPerLive + S * avgPlanetsPerSimple = targetCpuPlanets
+        // Risolvendo: L = targetCpuPlanets * cpuLiveShare / (cpuLiveShare + 100 * avgPlanetsPerLive / avgPlanetsPerSimple)
+        // Ma per semplicità usiamo la formula approssimata originale
         $targetLiveEmpires = (int)round($targetCpuPlanets * $cpuLiveShare / ($cpuLiveShare + 100));
         $targetLiveEmpires = min($targetLiveEmpires, $maxLiveEmpires);
         $targetLiveEmpires = max($targetLiveEmpires, 1);
@@ -218,7 +220,8 @@ final class Galaxy
         $remainingPlanets = $targetCpuPlanets - ($targetLiveEmpires * $avgPlanetsPerLive);
         $targetSimpleEmpires = max(0, (int)ceil($remainingPlanets / $avgPlanetsPerSimple));
 
-        $personalities = ['aggressive', 'defensive', 'economic', 'technological', 'opportunistic'];
+        $cpuConfig = $config->get('cpu');
+        $personalities = array_keys($cpuConfig['personalities'] ?? ['aggressive', 'defensive', 'economic', 'technological', 'opportunistic']);
 
         $cpuEmpires = [
             'live' => [],
@@ -247,7 +250,7 @@ final class Galaxy
         }
 
         // Crea imperi CPU semplificati
-        $simpleTiers = ['inactive', 'weak', 'medium'];
+        $simpleTiers = array_keys($cpuConfig['simple_tiers'] ?? ['inactive', 'weak', 'medium']);
         for ($i = 0; $i < $targetSimpleEmpires; $i++) {
             $tier = $simpleTiers[$rng->getInt(0, count($simpleTiers) - 1)];
             $stmt = $pdo->prepare("
