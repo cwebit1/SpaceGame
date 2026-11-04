@@ -23,6 +23,7 @@ use SpaceGame\Api\AuthController;
 use SpaceGame\Api\GamesController;
 use SpaceGame\Api\BuildController;
 use SpaceGame\Api\BodyController;
+use SpaceGame\Api\ConfigController;
 
 // CORS headers per sviluppo (in produzione limitare agli origin consentiti)
 header('Access-Control-Allow-Origin: *');
@@ -45,6 +46,12 @@ $path = preg_replace('#/api/?$#', '/api', $path);
 
 // Routing
 try {
+    // Config endpoints
+    elseif ($path === '/api/config/format' && $method === 'GET') {
+        ConfigController::format();
+    } elseif ($path === '/api/config/public' && $method === 'GET') {
+        ConfigController::public();
+    }
     // Auth endpoints
     if ($path === '/api/login' && $method === 'POST') {
         AuthController::login();
