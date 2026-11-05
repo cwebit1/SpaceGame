@@ -40,7 +40,8 @@
       "oceanic": { "deuterium": 1.2 },
       "desert": { "solar": 1.2 },
       "standard": {}
-    }
+    },
+    "base_fields_planet": 2000
   },
   "resources": {
     "base_production": {
@@ -342,7 +343,7 @@
   },
   "cpu": {
     "max_live_empires": 150,
-    "live_share_pct": 0.7,
+    "live_share_pct": 70,
     "resource_multiplier_max": 1.0,
     "research_multiplier_max": 1.0,
     "difficulty_levels": ["easy", "normal", "hard", "expert"],

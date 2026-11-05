@@ -146,6 +146,12 @@ final class Galaxy
             throw new RuntimeException("cpu_density deve essere tra {$settingsConfig['cpu_density_min']} e {$settingsConfig['cpu_density_max']}");
         }
 
+        // CPU live share (percentuale imperi CPU vivi)
+        $cpuLiveShare = (float)($settings['cpu_live_share'] ?? ($defaultsConfig['cpu_live_share'] ?? ($config->get('cpu.live_share_pct') ?? 70)));
+        if ($cpuLiveShare < 0 || $cpuLiveShare > 100) {
+            throw new RuntimeException("cpu_live_share deve essere tra 0 e 100");
+        }
+
         // CPU planet size
         $cpuPlanetSize = (float)($settings['cpu_planet_size'] ?? ($defaultsConfig['cpu_planet_size'] ?? ($settingsConfig['cpu_planet_size_min'] ?? 50)));
         if ($cpuPlanetSize < $settingsConfig['cpu_planet_size_min'] || $cpuPlanetSize > $settingsConfig['cpu_planet_size_max']) {
@@ -199,26 +205,51 @@ final class Galaxy
         $avgPlanetsPerLive = (int)($cpuConfig['avg_planets_per_live'] ?? 2);
         $avgPlanetsPerSimple = (int)($cpuConfig['avg_planets_per_simple'] ?? 1);
 
-        // Calcola numero imperi live target basato sulla quota di imperi (non pianeti)
-        // cpuLiveShare = percentuale di imperi CPU che devono essere 'live' (es. 70%)
-        // Sia L = imperi live, S = imperi simple
-        // L / (L + S) = cpuLiveShare / 100
-        // Pianeti totali = L * avgPlanetsPerLive + S * avgPlanetsPerSimple = targetCpuPlanets
-        // Risolvendo: L = targetCpuPlanets * cpuLiveShare / (cpuLiveShare + 100 * avgPlanetsPerLive / avgPlanetsPerSimple)
-        // Ma per semplicità usiamo la formula approssimata originale
-        $targetLiveEmpires = (int)round($targetCpuPlanets * $cpuLiveShare / ($cpuLiveShare + 100));
-        $targetLiveEmpires = min($targetLiveEmpires, $maxLiveEmpires);
-        $targetLiveEmpires = max($targetLiveEmpires, 1);
+        // Calcola numero imperi live (L) e simple (S) per rispettare sia:
+        // 1. Ratio imperi: L / (L + S) = cpuLiveShare / 100
+        // 2. Pianeti totali: L * avgPlanetsPerLive + S * avgPlanetsPerSimple = targetCpuPlanets
+        //
+        // Risolvendo:
+        // Se cpuLiveShare = 0: L = 0, S = targetCpuPlanets / avgPlanetsPerSimple
+        // Se cpuLiveShare = 100: S = 0, L = targetCpuPlanets / avgPlanetsPerLive
+        // Altrimenti:
+        //   S = targetCpuPlanets / (cpuLiveShare * avgPlanetsPerLive / (100 - cpuLiveShare) + avgPlanetsPerSimple)
+        //   L = cpuLiveShare * S / (100 - cpuLiveShare)
+        if ($cpuLiveShare <= 0) {
+            $targetLiveEmpires = 0;
+            $targetSimpleEmpires = max(1, (int)ceil($targetCpuPlanets / $avgPlanetsPerSimple));
+        } elseif ($cpuLiveShare >= 100) {
+            $targetLiveEmpires = max(1, (int)ceil($targetCpuPlanets / $avgPlanetsPerLive));
+            $targetSimpleEmpires = 0;
+        } else {
+            $ratio = $cpuLiveShare / (100 - $cpuLiveShare);
+            $denominator = $ratio * $avgPlanetsPerLive + $avgPlanetsPerSimple;
+            $targetSimpleEmpires = max(1, (int)round($targetCpuPlanets / $denominator));
+            $targetLiveEmpires = max(1, (int)round($ratio * $targetSimpleEmpires));
+        }
+
+        // Applica il tetto max_live_empires
+        if ($targetLiveEmpires > $maxLiveEmpires) {
+            $targetLiveEmpires = $maxLiveEmpires;
+            // Ricalcola simple per coprire i pianeti rimanenti
+            $remainingPlanets = $targetCpuPlanets - ($targetLiveEmpires * $avgPlanetsPerLive);
+            $targetSimpleEmpires = max(0, (int)ceil($remainingPlanets / $avgPlanetsPerSimple));
+        }
 
         // Ensure live empires don't consume more planets than available
         $maxLiveEmpiresByPlanets = (int)floor($targetCpuPlanets / $avgPlanetsPerLive);
         if ($targetLiveEmpires > $maxLiveEmpiresByPlanets) {
             $targetLiveEmpires = max($maxLiveEmpiresByPlanets, 1);
+            $remainingPlanets = $targetCpuPlanets - ($targetLiveEmpires * $avgPlanetsPerLive);
+            $targetSimpleEmpires = max(0, (int)ceil($remainingPlanets / $avgPlanetsPerSimple));
         }
 
         // Calcola imperi semplificati per coprire i pianeti rimanenti
         $remainingPlanets = $targetCpuPlanets - ($targetLiveEmpires * $avgPlanetsPerLive);
-        $targetSimpleEmpires = max(0, (int)ceil($remainingPlanets / $avgPlanetsPerSimple));
+        if ($remainingPlanets < 0) {
+            $remainingPlanets = 0;
+        }
+        $targetSimpleEmpires = max($targetSimpleEmpires, (int)ceil($remainingPlanets / $avgPlanetsPerSimple));
 
         $cpuConfig = $config->get('cpu');
         $personalities = array_keys($cpuConfig['personalities'] ?? ['aggressive', 'defensive', 'economic', 'technological', 'opportunistic']);

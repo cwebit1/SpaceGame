@@ -153,6 +153,12 @@ final class Games
             throw new RuntimeException("cpu_density deve essere tra {$settingsConfig['cpu_density_min']} e {$settingsConfig['cpu_density_max']}");
         }
 
+        // CPU live share (percentuale imperi CPU vivi)
+        $cpuLiveShare = (float)($settings['cpu_live_share'] ?? ($defaultsConfig['cpu_live_share'] ?? ($config->get('cpu.live_share_pct') ?? 70)));
+        if ($cpuLiveShare < 0 || $cpuLiveShare > 100) {
+            throw new RuntimeException("cpu_live_share deve essere tra 0 e 100");
+        }
+
         // CPU planet size
         $cpuPlanetSize = (float)($settings['cpu_planet_size'] ?? ($defaultsConfig['cpu_planet_size'] ?? ($settingsConfig['cpu_planet_size_min'] ?? 50)));
         if ($cpuPlanetSize < $settingsConfig['cpu_planet_size_min'] || $cpuPlanetSize > $settingsConfig['cpu_planet_size_max']) {

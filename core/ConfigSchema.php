@@ -15,7 +15,7 @@ final class ConfigSchema
         'research', 'ships', 'defenses', 'missiles', 'upgrades',
         'combat', 'fleet', 'moon', 'power', 'cpu', 'pirates',
         'gauntlet', 'admiral', 'mining', 'market', 'diplomacy',
-        'events', 'log', 'format', 'realtime'
+        'events', 'log', 'format', 'realtime', 'formula'
     ];
 
     /** Campi richiesti per ogni edificio */
@@ -113,7 +113,10 @@ final class ConfigSchema
         // 23. Realtime
         self::validateRealtime($config['realtime']);
 
-        // 24. Settings
+        // 24. Formula
+        self::validateFormula($config['formula']);
+
+        // 25. Settings
         self::validateSettings($config['settings']);
 
         // 25. Galaxy
@@ -429,6 +432,26 @@ final class ConfigSchema
                 throw new ConfigError("CPU: campo mancante '{$field}'");
             }
         }
+
+        // live_share_pct deve essere percentuale intera 0-100
+        $liveSharePct = $cpu['live_share_pct'];
+        if (!is_numeric($liveSharePct) || $liveSharePct < 0 || $liveSharePct > 100) {
+            throw new ConfigError("CPU.live_share_pct deve essere una percentuale intera tra 0 e 100 (valore: {$liveSharePct})");
+        }
+
+        // max_live_empires deve essere >= 1
+        $maxLiveEmpires = $cpu['max_live_empires'];
+        if (!is_int($maxLiveEmpires) || $maxLiveEmpires < 1) {
+            throw new ConfigError("CPU.max_live_empires deve essere un intero >= 1 (valore: {$maxLiveEmpires})");
+        }
+
+        // resource_multiplier_max e research_multiplier_max devono essere > 0
+        foreach (['resource_multiplier_max', 'research_multiplier_max'] as $field) {
+            $val = $cpu[$field];
+            if (!is_numeric($val) || $val <= 0) {
+                throw new ConfigError("CPU.{$field} deve essere > 0 (valore: {$val})");
+            }
+        }
     }
 
     private static function validatePirates(array $pirates): void
@@ -543,11 +566,26 @@ final class ConfigSchema
 
     private static function validateGalaxy(array $galaxy): void
     {
-        $required = ['positions_per_system', 'planet_positions', 'warp_position', 'asteroid_positions', 'planet_types', 'position_temp_modifiers', 'planet_type_modifiers'];
+        $required = ['positions_per_system', 'planet_positions', 'warp_position', 'asteroid_positions', 'planet_types', 'position_temp_modifiers', 'planet_type_modifiers', 'base_fields_planet'];
         foreach ($required as $field) {
             if (!array_key_exists($field, $galaxy)) {
                 throw new ConfigError("Galaxy: campo mancante '{$field}'");
             }
+        }
+    }
+
+    private static function validateFormula(array $formula): void
+    {
+        $required = ['construction_cost_divisor'];
+        foreach ($required as $field) {
+            if (!array_key_exists($field, $formula)) {
+                throw new ConfigError("Formula: campo mancante '{$field}'");
+            }
+        }
+
+        $divisor = $formula['construction_cost_divisor'];
+        if (!is_numeric($divisor) || $divisor <= 0) {
+            throw new ConfigError("Formula.construction_cost_divisor deve essere > 0 (valore: {$divisor})");
         }
     }
 }

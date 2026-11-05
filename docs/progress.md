@@ -56,8 +56,38 @@
 - Tutti i task (1-5) completati con test verdi.
 - Task 7 WIP salvato (`wip: Task 7`) per Milestone B.
 - File di progetto salvati (`chore: file di progetto`).
-- Revisione Qwen milestone A: **IN ATTESA DELLE RISPOSTE DI QWEN** — `errori.md` e `soluzioni.md` sono template non compilati.
-  - Revisione non pronta: vale la regola del punto 2 di `PROMPT-MILESTONE.md` (saltala e prosegui con la milestone B).
+- Revisione Qwen milestone A: **COMPLETATA** — Fix applicati per errori alta/media gravità:
+  - E1: Campi base pianeta hard-coded → Fixed (bd3ee6b)
+  - E2: Divisore tempi costruzione hard-coded → Fixed (bd3ee6b)
+  - E3: Default silenziosi formule upgrades → Deferred (low priority)
+  - E4: Costanti gameplay CPU hard-coded → Deferred (low priority)
+  - E5: Default incoerenti Games::create vs validateSettings → Fixed (f7c7de1)
+  - E6: Scala percentuale live_share_pct incoerente → Fixed (f7c7de1)
+  - E7: Formula live-share derivata negativa → Fixed (9edc1c8)
+  - E8: Pianeta madre casuale e query N+1 → Fixed
+  - E9: mt_srand globale non deterministico → Fixed
+  - E10: randomPlanetType ignora config → Fixed
+  - E11: short() non sale di scala correttamente → Fixed (current)
+  - E12: Arrotondamento divergente PHP/JS → Fixed (current)
+  - E13: Notazione scientifica virgola rifiutata in PHP → Fixed (current)
+  - E14: parse() limiti superiori assenti → Fixed (current)
+  - E15: Ambiguità separatore migliaia/decimale → Fixed (current)
+  - E16: Singleton PDO ignora flag $test → Fixed
+  - E17: Lock ricorsivo e timeout disallineato → Fixed
+  - E18: PK asteroid_progress incompleta → Fixed
+  - E20: Install non crea utente admin → Fixed
+  - E21: Logout senza verifica CSRF → Fixed
+  - E22: CORS unsafe con credenziali → Fixed
+  - E23: Login senza rate-limit/tronca username → Fixed
+  - E24: Nome partita non validato → Fixed
+  - E25: Nome DB interpolato senza escaping → Fixed
+  - E26: Token CSRF solo via header → Fixed (080e03b)
+  - E27: Config::fromFile non valida schema → Fixed (126dc7a)
+  - E28: Endpoint GET /api/config/format mancante → Fixed (c393a71)
+  - E29: Games::create ignora config partita → Deferred (low priority)
+  - E30: processed_until inizializzato a 0 → Fixed (129fc3e)
+  - E31: mt_srand($seed) inquina PRNG globale → Fixed
+- Da gestire (bassa gravità): E3, E4, E19, E29, E32-E37
 - Il tag `milestone-A` spostato su commit `a8d9da2` (Task 5 completo).
 
 ---

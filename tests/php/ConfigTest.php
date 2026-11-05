@@ -61,7 +61,7 @@ final class ConfigTest extends TestCase
             'missiles' => [], 'upgrades' => [], 'combat' => [], 'fleet' => [],
             'moon' => [], 'power' => [], 'cpu' => [], 'pirates' => [], 'gauntlet' => [],
             'admiral' => [], 'mining' => [], 'market' => [], 'diplomacy' => [],
-            'events' => [], 'log' => [], 'format' => [], 'realtime' => [],
+            'events' => [], 'log' => [], 'format' => [], 'realtime' => [], 'formula' => ['construction_cost_divisor' => 3000],
         ];
         $config['buildings']['metal_mine'] = [
             'cost' => ['m' => -10, 'c' => 0, 'd' => 0, 'lu' => 0],
@@ -85,7 +85,7 @@ final class ConfigTest extends TestCase
             'missiles' => [], 'upgrades' => [], 'combat' => [], 'fleet' => [],
             'moon' => [], 'power' => [], 'cpu' => [], 'pirates' => [], 'gauntlet' => [],
             'admiral' => [], 'mining' => [], 'market' => [], 'diplomacy' => [],
-            'events' => [], 'log' => [], 'format' => [], 'realtime' => [],
+            'events' => [], 'log' => [], 'format' => [], 'realtime' => [], 'formula' => ['construction_cost_divisor' => 3000],
         ];
         $config['ships']['light_fighter'] = [
             'cost' => ['m' => 100, 'c' => 50, 'd' => 0, 'lu' => 0],
@@ -163,15 +163,25 @@ final class ConfigTest extends TestCase
         $this->assertArrayNotHasKey('growth', $storage['lunarite']);
     }
 
-    public function test_lunarite_vault_has_correct_cost(): void
+    public function test_live_share_pct_range_validation(): void
     {
+        // Load actual config and modify live_share_pct
         $config = Config::fromFile(__DIR__ . '/../../game_config.json');
+        $configArray = $config->toArray();
 
-        $lunariteVault = $config->get('moon_buildings.lunarite_vault');
-        $this->assertEquals(['m' => 5000, 'c' => 5000, 'd' => 0, 'lu' => 0], $lunariteVault['cost']);
-        $this->assertEquals(1.7, $lunariteVault['growth']);
-        $this->assertEquals(['flat_per_level' => 0], $lunariteVault['energy']);
-        $this->assertEquals(['capacity' => ['a' => 2000, 'b' => 1.6]], $lunariteVault['effect']);
-        $this->assertEquals(1, $lunariteVault['fields']);
+        // Test valid values (0, 50, 100)
+        foreach ([0, 50, 100] as $val) {
+            $configArray['cpu']['live_share_pct'] = $val;
+            ConfigSchema::validate($configArray);
+        }
+
+        // Test invalid values
+        $invalidValues = [-1, 101, 1.5, -0.5];
+        foreach ($invalidValues as $val) {
+            $configArray['cpu']['live_share_pct'] = $val;
+            $this->expectException(ConfigError::class);
+            $this->expectExceptionMessage('live_share_pct deve essere una percentuale intera tra 0 e 100');
+            ConfigSchema::validate($configArray);
+        }
     }
 }

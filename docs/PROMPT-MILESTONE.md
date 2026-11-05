@@ -28,5 +28,6 @@ Sei lo sviluppatore di SpaceGame.
    - aggiorna `docs/progress.md` (milestone completata, commit, cosa funziona, note per la prossima);
    - fai il commit;
    - crea il tag `milestone-X` (es. `git tag milestone-A`) e fai `git push origin master --tags`; mai `--force`;
+   - **mai spostare, cancellare o ricreare un tag esistente** e non chiedere di farlo: un tag già creato resta dov'è. Le correzioni delle revisioni fatte dopo il tag vanno nei commit normali e nel tag della milestone successiva;
    - scrivi all'utente: **"Milestone X completata e caricata su GitHub. Revisione: https://github.com/cwebit1/SpaceGame/compare/<tag precedente>...milestone-X (per la milestone A: https://github.com/cwebit1/SpaceGame/tree/milestone-A). Salva le due risposte di Qwen in docs/reviews/milestone-X/errori.md e docs/reviews/milestone-X/soluzioni.md, poi chiudi questa sessione con /exit e rilancia avvia-spacegame.cmd."**
    - poi **fermati**: non iniziare la milestone successiva.

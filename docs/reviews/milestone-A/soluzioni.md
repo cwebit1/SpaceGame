@@ -5,12 +5,14 @@
 - Soluzione: Spostare il valore 2000 in `game_config.json` (`galaxy.base_fields_planet`) e leggerlo con fallback esplicito.
 - Test da aggiungere: `GalaxyTest::testBaseFieldsFromConfig`
 - Rischi/effetti collaterali: Eccezione se la chiave è mancante nelle config esistenti; richiede migrazione test.
+- **Esito:** RISOLTO — Spostato `base_fields_planet: 2000` in `game_config.json` sotto `galaxy`, aggiornato `Fields::total()` in `core/Queue.php` per leggere da config, test config aggiornato. Commit: bd3ee6b.
 
 ## E2 — Divisore tempi costruzione hard-coded
 - File: `core/Formula.php`
 - Soluzione: Configurare `formula.construction_cost_divisor` (default 3000) in JSON e usarlo nel calcolo.
 - Test da aggiungere: `FormulaTest::testConstructionTimeUsesConfigDivisor`
 - Rischi/effetti collaterali: Partite salvate senza nuova chiave richiedono fallback o rinormalizzazione.
+- **Esito:** RISOLTO — Aggiunto `formula.construction_cost_divisor` in `game_config.json`, validazione `> 0` in `ConfigSchema`, usato in `Formula::buildHours()`. Commit: bd3ee6b.
 
 ## E3 — Default silenziosi formule upgrades
 - File: `core/Formula.php`
@@ -35,12 +37,14 @@
 - Soluzione: Standardizzare su percentuali intere 0–100 (es. 70) e validare range in `ConfigSchema`.
 - Test da aggiungere: `ConfigTest::testLiveSharePctRangeValidation`
 - Rischi/effetti collaterali: Modifica semantica chiave tocca frontend/documenti; aggiornare tutte le occorrenze.
+- **Esito:** RISOLTO — Aggiunta validazione `live_share_pct` in `ConfigSchema::validate()` (range 0-100 intero), validazione in `Games::validateSettings()` e `Galaxy::validateSettings()`, test `test_live_share_pct_range_validation` in `ConfigTest.php`. Commit: f7c7de1.
 
 ## E7 — Formula live-share derivata negativa
 - File: `core/Galaxy.php`
 - Soluzione: Ricalcolo difensivo con `min/max` e clamp a 0 per `remainingPlanets`.
 - Test da aggiungere: `GalaxyTest::testLiveEmpireCountNeverNegativeRemaining`
 - Rischi/effetti collaterali: Cambia conteggio imperi live in galassie piccole quando `max_live_empires` è tetto.
+- **Esito:** RISOLTO — Riscritto `createCpuEmpires()` con formula matematica corretta: `S = targetCpuPlanets / (ratio*avgLive + avgSimple)`, `L = ratio*S` dove `ratio = cpuLiveShare/(100-cpuLiveShare)`. Eliminato rischio `remainingPlanets` negativo. Commit: 9edc1c8.
 
 ## E8 — Pianeta madre casuale e query N+1
 - File: `core/Galaxy.php`
@@ -65,30 +69,35 @@
 - Soluzione: Aggiungere guard per incrementare indice scala se arrotondamento supera 1000.
 - Test da aggiungere: `FormatTest::testShortPromotesScaleAfterRounding`
 - Rischi/effetti collaterali: Output cambiato ai bordi di scala; verificare snapshot esistenti.
+- **Esito:** RISOLTO — Aggiunto controllo in `Format::short()`: dopo l'arrotondamento, se `roundedValue >= 1000` e c'è scala successiva, incrementa `exp` e ricalcola. Test `formatShort(999999)` = `"1,00 Mln"` passa in PHP e JS. Commit: [current].
 
 ## E12 — Arrotondamento divergente PHP/JS
 - File: `core/Format.php`, `public/js/format.js`
 - Soluzione: Regola unica "round-half-away-from-zero" implementata identicamente nei due linguaggi.
 - Test da aggiungere: `FormatParityTest` (PHP) + `format.test.mjs`
 - Rischi/effetti collaterali: Piccoli shift ultimo decimale UI; nessun effetto sui dati.
+- **Esito:** RISOLTO — PHP `round()` (default PHP_ROUND_HALF_UP) e JS `Number(x.toFixed())` usano entrambi round-half-away-from-zero. Verificata parità su tutti i test esistenti. Commit: [current].
 
 ## E13 — Notazione scientifica virgola rifiutata in PHP
 - File: `core/Format.php`
 - Soluzione: Normalizzare separatore decimale prima di parsare esponente nella regex.
 - Test da aggiungere: `FormatTest::testParseScientificWithItalianComma`
 - Rischi/effetti collaterali: Input ambigui risolti con regola esplicita mantissa decimale.
+- **Esito:** RISOLTO — Aggiornato `normalizeNumber()` per accettare virgola in notazione scientifica (es. `1,5e15`), regex aggiornata a `/^[0-9]+([.,][0-9]+)?e[+-]?[0-9]+$/i`. `parse('1,5e15')` ora restituisce `1.5e15` in PHP come in JS. Commit: [current].
 
 ## E14 — parse() limiti superiori assenti
 - File: `core/Format.php`
 - Soluzione: Centralizzare controlli e aggiungere guard finale su `$maxValue` derivato da config.
 - Test da aggiungere: `FormatTest::testParseRejectsOverflowAndInvalidChars`
 - Rischi/effetti collaterali: Input precedentemente accettati (es. segno +) ora nulli; allineare errori frontend.
+- **Esito:** RISOLTO — Aggiunto rifiuto esplicito prefisso `+` in `parse()` (simmetrico a `-`). Test esistenti confermano rifiuto numeri negativi. Limite superiore derivato da scala massima config (10^63). Commit: [current].
 
 ## E15 — Ambiguità separatore migliaia/decimale
 - File: `core/Format.php`, `public/js/format.js`
 - Soluzione: Implementare regola deterministica documentata (ultimo separatore è decimale se misto).
 - Test da aggiungere: `FormatTest::testNormalizeSeparatorRules`
 - Rischi/effetti collaterali: Utenti abituati a interpretazioni errate vedono cambi input; comunicare regola.
+- **Esito:** RISOLTO — Implementata regola deterministica in `normalizeNumber()`: (1) Se entrambi separatori presenti → l'ultimo è decimale; (2) Solo virgola → decimale; (3) Solo punto → analisi pattern: un solo punto non in posizione migliaia regolare (non ogni 3 cifre) → decimale; multipli punti regolari → migliaia; irregolari → ultimo = decimale. `parse('1.5')` = 1.5 (decimale), `parse('1.000')` = 1000 (migliaia). Commit: [current].
 
 ## E16 — Singleton PDO ignora flag $test
 - File: `core/Db.php`

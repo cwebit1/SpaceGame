@@ -78,6 +78,16 @@ final class Format
 
         $divisor = pow(10, $exp * 3);
         $value = $x / $divisor;
+
+        // Arrotonda per controllare se dobbiamo salire di scala (E11)
+        // Se l'arrotondamento porta a >= 1000, passa alla scala successiva
+        $roundedValue = round($value, self::$decimals);
+        if ($roundedValue >= 1000 && $exp < $maxIndex) {
+            $exp++;
+            $divisor = pow(10, $exp * 3);
+            $value = $x / $divisor;
+        }
+
         $suffix = self::$scale[$exp - 1]; // k è indice 0 = 10^3
 
         $formatted = self::formatNumber($value, self::$decimals);
@@ -101,33 +111,128 @@ final class Format
      * Normalizza una stringa numerica italiana in formato standard (decimal point = .)
      * Gestisce separatori migliaia (.) e decimali (,) correttamente.
      * Non modifica la notazione scientifica.
+     * Regola deterministica per ambiguità (E15):
+     * - Se entrambi i separatori presenti: l'ultimo è il decimale (convenzione italiana)
+     * - Se solo virgola presente: è decimale
+     * - Se solo punto presente:
+     *   - Se appare esattamente una volta e non in posizione migliaia (non ogni 3 cifre da destra): decimale
+     *   - Altrimenti: separatore migliaia
      */
     private static function normalizeNumber(string $s): string
     {
         $s = trim($s);
 
-        // Se è notazione scientifica, non modificare
-        if (preg_match('/^[0-9]+(\.[0-9]+)?e[+-]?[0-9]+$/i', $s)) {
-            return $s;
+        // Se è notazione scientifica (con . o , come separatore decimale), non modificare
+        // Accetta sia 1.5e15 che 1,5e15 (E13)
+        if (preg_match('/^[0-9]+([.,][0-9]+)?e[+-]?[0-9]+$/i', $s)) {
+            // Sostituisce eventuale virgola decimale con punto per il parsing standard
+            return str_replace(',', '.', $s);
         }
 
+        $hasDecimalSep = str_contains($s, self::$decimalSeparator);
+        $hasThousandsSep = str_contains($s, self::$thousandsSeparator);
+
         // Se contiene il separatore decimale italiano
-        if (str_contains($s, self::$decimalSeparator)) {
-            // Divide in parte intera e decimale
+        if ($hasDecimalSep) {
+            // Se ha anche separatori migliaia, l'ultimo separatore è il decimale (E15)
+            if ($hasThousandsSep) {
+                $lastDecimalPos = strrpos($s, self::$decimalSeparator);
+                $lastThousandsPos = strrpos($s, self::$thousandsSeparator);
+
+                if ($lastDecimalPos > $lastThousandsPos) {
+                    // L'ultimo separatore è il decimale - convenzione standard
+                    $parts = explode(self::$decimalSeparator, $s, 2);
+                    $integerPart = $parts[0];
+                    $decimalPart = $parts[1] ?? '';
+
+                    // Rimuove separatori migliaia solo dalla parte intera
+                    $integerPart = str_replace(self::$thousandsSeparator, '', $integerPart);
+
+                    return $integerPart . ($decimalPart !== '' ? '.' . $decimalPart : '');
+                } else {
+                    // L'ultimo separatore è il migliaia - trattiamo la virgola come migliaia (raro)
+                    // Ma per coerenza, se la virgola è l'unico separatore decimale-like, la usiamo come decimale
+                    $parts = explode(self::$decimalSeparator, $s, 2);
+                    $integerPart = $parts[0];
+                    $decimalPart = $parts[1] ?? '';
+
+                    $integerPart = str_replace(self::$thousandsSeparator, '', $integerPart);
+
+                    return $integerPart . ($decimalPart !== '' ? '.' . $decimalPart : '');
+                }
+            }
+
+            // Solo separatore decimale (virgola) presente
             $parts = explode(self::$decimalSeparator, $s, 2);
             $integerPart = $parts[0];
             $decimalPart = $parts[1] ?? '';
 
-            // Rimuove separatori migliaia solo dalla parte intera
+            // Rimuove separatori migliaia solo dalla parte intera (anche se non dovrebbero essercene)
             $integerPart = str_replace(self::$thousandsSeparator, '', $integerPart);
 
-            // Ricompone con punto decimale standard
             return $integerPart . ($decimalPart !== '' ? '.' . $decimalPart : '');
         }
 
-        // Nessun separatore decimale italiano: potrebbe avere solo separatori migliaia
-        // Rimuove tutti i separatori migliaia
-        return str_replace(self::$thousandsSeparator, '', $s);
+        // Nessun separatore decimale italiano: potrebbe avere solo separatori migliaia (punti)
+        // OPPURE un punto come separatore decimale (es. "1.5" in notazione internazionale) - E15
+        if ($hasThousandsSep) {
+            // Conta i punti
+            $dotCount = substr_count($s, self::$thousandsSeparator);
+
+            if ($dotCount === 1) {
+                // Un solo punto: controlla se è in posizione migliaia (ogni 3 cifre da destra)
+                $dotPos = strpos($s, self::$thousandsSeparator);
+                $afterDot = strlen($s) - $dotPos - 1;
+
+                // Se dopo il punto ci sono 1-3 cifre ma non un multiplo di 3, o se la parte prima ha <= 3 cifre
+                // è probabile che sia un separatore decimale
+                $beforeDot = $dotPos;
+
+                // Esempi: "1.5" (1 cifra prima, 1 dopo) -> decimale
+                // "12.345" (2 prima, 3 dopo) -> migliaia
+                // "1.234" (1 prima, 3 dopo) -> potrebbe essere decimale o migliaia
+                // Regola: se la parte prima ha <= 3 cifre E la parte dopo ha <= 3 cifre, trattiamo come decimale
+                // se la parte dopo non è esattamente 3 cifre
+                if ($beforeDot <= 3 && ($afterDot < 1 || $afterDot > 3 || $afterDot % 3 !== 0)) {
+                    // Probabile separatore decimale
+                    $parts = explode(self::$thousandsSeparator, $s, 2);
+                    $integerPart = $parts[0];
+                    $decimalPart = $parts[1] ?? '';
+                    return $integerPart . ($decimalPart !== '' ? '.' . $decimalPart : '');
+                }
+            } else {
+                // Più punti: controlla se sono in posizione migliaia regolare (ogni 3 cifre da destra)
+                $parts = explode(self::$thousandsSeparator, $s);
+                $isRegularThousands = true;
+                // L'ultima parte (destra) può avere 1-3 cifre
+                // Le altre devono avere esattamente 3 cifre
+                for ($i = 0; $i < count($parts) - 1; $i++) {
+                    if (strlen($parts[$i]) !== 3) {
+                        $isRegularThousands = false;
+                        break;
+                    }
+                }
+                // L'ultima parte deve avere 1-3 cifre
+                if (strlen($parts[count($parts) - 1]) < 1 || strlen($parts[count($parts) - 1]) > 3) {
+                    $isRegularThousands = false;
+                }
+
+                if ($isRegularThousands) {
+                    // È separatori migliaia regolari - rimuovi tutti
+                    return str_replace(self::$thousandsSeparator, '', $s);
+                } else {
+                    // Non regolare - potrebbe essere input malformato, trattiamo l'ultimo come decimale
+                    $lastDotPos = strrpos($s, self::$thousandsSeparator);
+                    $integerPart = substr($s, 0, $lastDotPos);
+                    $decimalPart = substr($s, $lastDotPos + 1);
+                    $integerPart = str_replace(self::$thousandsSeparator, '', $integerPart);
+                    return $integerPart . ($decimalPart !== '' ? '.' . $decimalPart : '');
+                }
+            }
+        }
+
+        // Nessun separatore presente
+        return $s;
     }
 
     /**
@@ -141,8 +246,13 @@ final class Format
             return null;
         }
 
-        // Rifiuta numeri negativi (per validazione input utente)
+        // Rifiuta numeri negativi (per validazione input utente) - E14
         if (str_starts_with($s, '-')) {
+            return null;
+        }
+
+        // Rifiuta prefisso '+' esplicito per coerenza - E14
+        if (str_starts_with($s, '+')) {
             return null;
         }
 
@@ -169,14 +279,14 @@ final class Format
             }
         }
 
-        // Prova notazione scientifica (es. 1.5e15)
+        // Prova notazione scientifica (es. 1.5e15 o 1,5e15) - E13
         $normalized = self::normalizeNumber($s);
         if (preg_match('/^[0-9]+(\.[0-9]+)?e[+-]?[0-9]+$/i', $normalized)) {
             $val = (float)$normalized;
             return is_finite($val) ? $val : null;
         }
 
-        // Prova numero semplice
+        // Prova numero semplice - gestisce ambiguità separatori (E15)
         $normalized = self::normalizeNumber($s);
         $num = self::parseNumber($normalized);
         return $num;

@@ -504,8 +504,8 @@ final class Fields
 {
     /**
      * Spazi totali del corpo.
-     * Pianeta: 2000 + 200 * Terraformer (Terraformer non occupa spazi)
-     * Luna: 1000 + 200 * (Nanoforge - 1) per livelli oltre il 1°
+     * Pianeta: base_fields_planet + 200 * Terraformer (Terraformer non occupa spazi)
+     * Luna: base_fields_moon + 200 * (Nanoforge - 1) per livelli oltre il 1°
      */
     public static function total(array $body, Config $cfg): int
     {
@@ -513,19 +513,21 @@ final class Fields
         $bonusFields = (int)($body['fields_bonus'] ?? 0);
 
         if ($body['is_moon'] ?? false) {
-            // Luna: base 1000 + 200 * (NF - 1)
+            // Luna: base_fields_moon + 200 * (NF - 1)
             $nfLevel = $body['buildings']['lunar_nanoforge']['level'] ?? 0;
             if ($nfLevel > 1) {
                 $bonusFields += 200 * ($nfLevel - 1);
             }
-            return 1000 + $bonusFields;
+            $moonBaseFields = (int)($cfg->get('moon.base_fields') ?? 1000);
+            return $moonBaseFields + $bonusFields;
         }
 
-        // Pianeta: base 2000 + 200 * Terraformer
+        // Pianeta: base_fields_planet + 200 * Terraformer
         $tfLevel = $body['buildings']['terraformer']['level'] ?? 0;
         $bonusFields += 200 * $tfLevel;
 
-        return 2000 + $bonusFields;
+        $planetBaseFields = (int)($cfg->get('galaxy.base_fields_planet') ?? 2000);
+        return $planetBaseFields + $bonusFields;
     }
 
     /**
@@ -580,7 +582,7 @@ final class Fields
      * pareggio: 0
      * bombardamento vinto: -100
      * bombardamento fallito: +50
-     * Mai sotto la base (pianeta 2000+Terraformer, luna base Nanoforge).
+     * Mai sotto la base (pianeta base_fields_planet+Terraformer, luna base_fields_moon Nanoforge).
      */
     public static function applyBattle(int $bodyId, string $outcome, Config $cfg): void
     {
@@ -610,14 +612,11 @@ final class Fields
 
         if (!$body) return;
 
-        $minFields = ($body['is_moon'] ?? false) ? 1000 : 2000;
-        // Aggiungi bonus Terraformer/NF
-        if (($body['is_moon'] ?? false)) {
-            // Per luna, base è 1000 + 200*(NF-1)
-            // Ma fields_base dovrebbe essere 1000
-            $minFields = 1000;
+        $isMoon = (bool)($body['is_moon'] ?? false);
+        if ($isMoon) {
+            $minFields = (int)($cfg->get('moon.base_fields') ?? 1000);
         } else {
-            $minFields = 2000;
+            $minFields = (int)($cfg->get('galaxy.base_fields_planet') ?? 2000);
         }
 
         $currentTotal = (int)$body['fields_base'] + (int)$body['fields_bonus'];
